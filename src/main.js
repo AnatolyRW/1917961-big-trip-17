@@ -3,8 +3,8 @@ import MainPresenter from './presenter/main-presenter';
 
 
 const siteMainElement = document.querySelector('.page-body__page-main');
-const tripEventsElement = siteMainElement.querySelector('.trip-events');
+const tripEventsTable = siteMainElement.querySelector('.trip-events');
 
 const mainPresenter = new MainPresenter();
 
-mainPresenter.init(tripEventsElement);
+mainPresenter.init(tripEventsTable);

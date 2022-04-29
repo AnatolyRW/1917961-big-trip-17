@@ -18,7 +18,8 @@
   "devDependencies": {
     "@babel/core": "7.17.9",
     "@babel/preset-env": "7.16.11",
-    "copy-webpack-plugin": "10.2.4",
+    "babel-loader": "8.2.4",
+    "copy-webpack-plugin": "^10.2.4",
     "eslint": "8.13.0",
     "eslint-config-htmlacademy": "5.1.2",
     "webpack": "5.72.0",
@@ -27,8 +28,5 @@
   },
   "engines": {
     "node": "16"
-  },
-  "dependencies": {
-    "babel-loader": "^8.2.4"
   }
 }
