@@ -1,6 +1,6 @@
 import { createElement } from '../render.js';
 
-const createTripEventAddTemplate = () => (`
+const createAddTripEventTemplate = () => (`
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -163,8 +163,9 @@ const createTripEventAddTemplate = () => (`
   </form>
 `);
 
-export default class NewTripEventAddTemplate {
-  getTemlate = () => createTripEventAddTemplate();
+export default class AddTripEventView {
+
+  getTemlate = () => createAddTripEventTemplate();
 
   getElement = () => {
     if (!this.element) {

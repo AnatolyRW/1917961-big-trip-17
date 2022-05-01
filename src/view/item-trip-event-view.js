@@ -40,7 +40,7 @@ const createItemTrioEventTemplate = () => (`
   </li>
 `);
 
-export default class NewItemTripEventTemplate {
+export default class ItemTripEventView {
   getTemlate = () => createItemTrioEventTemplate();
 
   getElement = () => {

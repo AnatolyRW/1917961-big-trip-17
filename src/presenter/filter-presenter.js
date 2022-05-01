@@ -1,6 +1,6 @@
-import NewFilterTemplate from '../view/filter-view.js';
+import FilterTripEventsView from '../view/filter-trip-events-view';
 import { render } from '../render.js';
 
 const tripControlsFiltersElement = document.querySelector('.trip-controls__filters');
 
-render(new NewFilterTemplate, tripControlsFiltersElement);
+render(new FilterTripEventsView, tripControlsFiltersElement);
