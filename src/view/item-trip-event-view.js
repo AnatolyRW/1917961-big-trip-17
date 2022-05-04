@@ -46,12 +46,11 @@ const createItemTrioEventTemplate = (tripEvent) => {
 };
 
 export default class ItemTripEventView {
-  constructor(tripEvent, offersWithType) {
+  constructor(tripEvent) {
     this.tripEvent = tripEvent;
-    this.offersWithType = offersWithType;
   }
 
-  getTemlate = () => createItemTrioEventTemplate(this.tripEvent, this.offersWithType);
+  getTemlate = () => createItemTrioEventTemplate(this.tripEvent);
 
   getElement = () => {
     if (!this.element) {

@@ -28,7 +28,7 @@ export default class MainPresenter {
 
     render(new SortTripEventsView(), this.tripEventsTable);
     render(this.listTripEvents, this.tripEventsTable);
-    render(new EditTripEvenView(), this.listTripEvents.getElement());
+    render(new EditTripEvenView(this.recorsTripEvents[1]), this.listTripEvents.getElement());
     for (let i = 0; i < this.recorsTripEvents.length; i++) {
       const itemTripEventView = new ItemTripEventView(this.recorsTripEvents[i]);
       render(itemTripEventView, this.listTripEvents.getElement());
