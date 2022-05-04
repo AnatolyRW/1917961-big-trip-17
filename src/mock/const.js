@@ -26,6 +26,6 @@ const TITLE_OFFER = [
 const NAME_CITYS = ['London, England', 'Paris, France', 'New York City, United States', 'Moscow, Russia', 'Dubai, United Arab Emirates', 'Tokyo, Japan', 'Barcelona, Spain'];
 const MAX_COUNT_LINE_DESCRIPTION_CITY = 5;
 const MAX_COUNT_PICTURE = 5;
-const MAX_PRICE = 50000;
+const MAX_PRICE = 1000;
 
 export { TRIP_EVENT_TYPES, DESCRIPTION_CITYS, NAME_CITYS, MAX_COUNT_LINE_DESCRIPTION_CITY, MAX_COUNT_PICTURE, MAX_PRICE, TITLE_OFFER };

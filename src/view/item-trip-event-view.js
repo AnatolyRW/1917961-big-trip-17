@@ -7,7 +7,6 @@ const createItemTrioEventTemplate = (tripEvent) => {
     dateTo,
     destination,
     isFavorite,
-    offers,
     type
   } = tripEvent;
   return (`
@@ -31,11 +30,6 @@ const createItemTrioEventTemplate = (tripEvent) => {
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          <li class="event__offer">
-            <span class="event__offer-title">Rent a car</span>
-            &plus;&euro;&nbsp;
-            <span class="event__offer-price">200</span>
-          </li>
         </ul>
         <button class="event__favorite-btn  ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
           <span class="visually-hidden">Add to favorite</span>
@@ -52,11 +46,12 @@ const createItemTrioEventTemplate = (tripEvent) => {
 };
 
 export default class ItemTripEventView {
-  constructor(tripEvent) {
+  constructor(tripEvent, offersWithType) {
     this.tripEvent = tripEvent;
+    this.offersWithType = offersWithType;
   }
 
-  getTemlate = () => createItemTrioEventTemplate(this.tripEvent);
+  getTemlate = () => createItemTrioEventTemplate(this.tripEvent, this.offersWithType);
 
   getElement = () => {
     if (!this.element) {
