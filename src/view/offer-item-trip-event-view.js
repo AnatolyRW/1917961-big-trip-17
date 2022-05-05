@@ -1,6 +1,6 @@
 import { createElement } from '../render.js';
 
-const createOfferTemplate = (offer) => (`
+const createOfferItemTripEventTemplate = (offer) => (`
     <li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
@@ -8,12 +8,12 @@ const createOfferTemplate = (offer) => (`
     </li>
 `);
 
-export default class OfferView {
+export default class OfferItemTripEventView {
   constructor(offer) {
     this.offer = offer;
   }
 
-  getTemlate = () => createOfferTemplate(this.offer);
+  getTemlate = () => createOfferItemTripEventTemplate(this.offer);
 
   getElement = () => {
     if (!this.element) {
