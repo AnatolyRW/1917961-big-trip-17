@@ -31,15 +31,21 @@ const createSortTripEventsTemplate = ()  => (`
 
 export default class SortTripEventsView {
 
-  getTemplate = () => createSortTripEventsTemplate();
+  #element = null;
 
-  getElement = () => {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get template() {
+    return createSortTripEventsTemplate();
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
-  };
+    return this.#element;
+  }
 
-  removeElement = () => { this.element = null; };
+  removeElement() {
+    this.#element = null;
+  }
 }
 

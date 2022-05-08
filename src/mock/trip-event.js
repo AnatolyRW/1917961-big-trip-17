@@ -42,7 +42,6 @@ const generateOffer = (offers) => {
 };
 
 const generateDateFrom = () => {
-
   const maxDaysGap = 3;
   const daysGap = getRandomInteger(-maxDaysGap, maxDaysGap);
   return dayjs().add(daysGap, 'day');

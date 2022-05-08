@@ -1,14 +1,14 @@
 import '../src/presenter/main-presenter';
 import MainPresenter from './presenter/main-presenter';
-import TripEventsModal from './model/trip-events-modal.js';
-import OffersModal from './model/offers-modal.js';
+import ItemsTripEventsModel from './model/items-trip-events-model.js';
+import TripEventTypesOffersModel from './model/trip-event-types-offers-model.js';
 
 
 const siteMainElement = document.querySelector('.page-body__page-main');
 const tripEventsTable = siteMainElement.querySelector('.trip-events');
 
-const offers = new OffersModal();
-const tripEvents = new TripEventsModal(offers);
+const tripEventTypesOffersModel = new TripEventTypesOffersModel();
+const itemsTripEvents = new ItemsTripEventsModel(tripEventTypesOffersModel);
 const mainPresenter = new MainPresenter();
 
-mainPresenter.init(tripEventsTable, tripEvents, offers);
+mainPresenter.init(tripEventsTable, itemsTripEvents, tripEventTypesOffersModel);
