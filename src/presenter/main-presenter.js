@@ -6,28 +6,45 @@ import ItemTripEventView from '../view/item-trip-event-view.js';
 import EditTripEvenView from '../view/edit-trip-event-view.js';
 import OfferItemTripEventView from '../view/offer-item-trip-event-view.js';
 import OfferEditTripEventView from '../view/offer-edit-trip-event-view.js';
+import NoTripEventsView from '../view/no-trip-events-view.js';
 
 export default class MainPresenter {
 
-  #listTripEvents = new ListTripEventsView();
+  #tripEventsContainer = null;
+  #listTripEvents = null;
   #offersWithType = null;
   #itemsTripEvents = null;
   #offers = null;
 
-  init = (tripEventsTable, itemsTripEvents, TripEventTypesOffers) => {
-    this.#itemsTripEvents = [...itemsTripEvents.tripEvents];
-    this.#offers = [...TripEventTypesOffers.offers];
+  constructor(tripEventsContainer, itemsTripEvents, TripEventTypesOffers) {
+    this.#tripEventsContainer = tripEventsContainer;
 
-    render(new SortTripEventsView(), tripEventsTable);
-    render(this.#listTripEvents, tripEventsTable);
-
-    for (let i = 0; i < this.#itemsTripEvents.length; i++) {
-      this.#renderItemTripEvent(this.#itemsTripEvents[i]);
+    if (itemsTripEvents) {
+      this.#itemsTripEvents = [...itemsTripEvents.tripEvents];
     }
 
-  };
+    if (TripEventTypesOffers) {
+      this.#offers = [...TripEventTypesOffers.offers];
+    }
 
-  #renderItemTripEventOffers (itemTripEventView, itemsTripEvent) {
+    this.#listTripEvents = new ListTripEventsView();
+  }
+
+  init() {
+    if (this.#itemsTripEvents) {
+      render(new SortTripEventsView(), this.#tripEventsContainer);
+      render(this.#listTripEvents, this.#tripEventsContainer);
+
+      for (let i = 0; i < this.#itemsTripEvents.length; i++) {
+        this.#renderItemTripEvent(this.#itemsTripEvents[i]);
+      }
+    } else {
+      render(new NoTripEventsView(), this.#tripEventsContainer);
+    }
+
+  }
+
+  #renderItemTripEventOffers(itemTripEventView, itemsTripEvent) {
     const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__selected-offers');
     this.#offersWithType = this.#offers.find((offer) => (offer.type === itemsTripEvent.type));
     for (let j = 0; j < this.#offersWithType.offers.length; j++) {
@@ -35,7 +52,7 @@ export default class MainPresenter {
     }
   }
 
-  #renderEditTripEventOffers (itemTripEventView, itemsTripEvent) {
+  #renderEditTripEventOffers(itemTripEventView, itemsTripEvent) {
     const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__available-offers');
     this.#offersWithType = this.#offers.find((offer) => (offer.type === itemsTripEvent.type));
     for (let j = 0; j < this.#offersWithType.offers.length; j++) {
@@ -43,7 +60,7 @@ export default class MainPresenter {
     }
   }
 
-  #renderItemTripEvent (itemTripEvent) {
+  #renderItemTripEvent(itemTripEvent) {
     const itemTripEventView = new ItemTripEventView(itemTripEvent);
     this.#renderItemTripEventOffers(itemTripEventView, itemTripEvent);
     const editTripEvenView = new EditTripEvenView(itemTripEvent);
