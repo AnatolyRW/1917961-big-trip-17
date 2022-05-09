@@ -165,17 +165,21 @@ const createAddTripEventTemplate = () => (`
 
 export default class AddTripEventView {
 
-  getTemlate = () => createAddTripEventTemplate();
+  #element = null;
 
-  getElement = () => {
-    if (!this.element) {
-      this.element = createElement(this.getTemlate());
+  get temlate() {
+    return createAddTripEventTemplate();
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.temlate);
     }
-    return this.element;
-  };
+    return this.#element;
+  }
 
-  removeElement = () => {
-    this.element = null;
-  };
+  removeElement() {
+    this.#element = null;
+  }
 
 }

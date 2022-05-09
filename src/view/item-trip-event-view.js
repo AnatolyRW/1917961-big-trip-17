@@ -46,21 +46,27 @@ const createItemTrioEventTemplate = (tripEvent) => {
 };
 
 export default class ItemTripEventView {
+
+  #tripEvent = null;
+  #element = null;
+
   constructor(tripEvent) {
-    this.tripEvent = tripEvent;
+    this.#tripEvent = tripEvent;
   }
 
-  getTemlate = () => createItemTrioEventTemplate(this.tripEvent);
+  get temlate() {
+    return createItemTrioEventTemplate(this.#tripEvent);
+  }
 
-  getElement = () => {
-    if (!this.element) {
-      this.element = createElement(this.getTemlate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.temlate);
     }
-    return this.element;
-  };
+    return this.#element;
+  }
 
-  removeElement = () => {
-    this.element = null;
-  };
+  removeElement() {
+    this.#element = null;
+  }
 
 }

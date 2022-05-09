@@ -9,51 +9,79 @@ import OfferEditTripEventView from '../view/offer-edit-trip-event-view.js';
 
 export default class MainPresenter {
 
-  listTripEvents = new ListTripEventsView();
-  firstItemTripEventTemplate = new ItemTripEventView();
+  #listTripEvents = new ListTripEventsView();
+  #offersWithType = null;
+  #itemsTripEvents = null;
+  #offers = null;
 
-  isUseOffer = (idOffer) => function (element) {
-    return element['id'] === idOffer;
-  };
+  init = (tripEventsTable, itemsTripEvents, TripEventTypesOffers) => {
+    this.#itemsTripEvents = [...itemsTripEvents.tripEvents];
+    this.#offers = [...TripEventTypesOffers.offers];
 
-  init = (tripEventsTable, tripEvents, offers) => {
-    this.tripEventsTable = tripEventsTable;
-    this.tripEvents = tripEvents;
-    this.recorsTripEvents = [...this.tripEvents.getTripEvents()];
-    this.offers = [...offers.getOffers()];
-    this.useOffersId = null;
-    this.offersWithType = null;
+    render(new SortTripEventsView(), tripEventsTable);
+    render(this.#listTripEvents, tripEventsTable);
 
-    //console.log(this.recorsTripEvents);
-
-    render(new SortTripEventsView(), this.tripEventsTable);
-    render(this.listTripEvents, this.tripEventsTable);
-
-    const editTripEvenView = new EditTripEvenView(this.recorsTripEvents[0]);
-    render(editTripEvenView , this.listTripEvents.getElement());
-    const editTripEventForOffersElement = editTripEvenView.getElement().querySelector('.event__available-offers');
-    this.useOffersId = this.recorsTripEvents[0].offers;
-    this.offersWithType = this.offers.find((offer) => (offer.type === this.recorsTripEvents[0].type));
-
-    for (let j = 0; j < this.offersWithType.offers.length; j++) {
-      render(new OfferEditTripEventView(this.offersWithType.offers[j], this.useOffersId), editTripEventForOffersElement);
+    for (let i = 0; i < this.#itemsTripEvents.length; i++) {
+      this.#renderItemTripEvent(this.#itemsTripEvents[i]);
     }
 
-    for (let i = 0; i < this.recorsTripEvents.length; i++) {
+  };
 
-      const itemTripEventView = new ItemTripEventView(this.recorsTripEvents[i]);
-      render(itemTripEventView, this.listTripEvents.getElement());
-      const itemTripEventForOffersElement = itemTripEventView.getElement().querySelector('.event__selected-offers');
-      this.useOffersId = this.recorsTripEvents[i].offers;
+  #renderItemTripEventOffers (itemTripEventView, itemsTripEvent) {
+    const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__selected-offers');
+    this.#offersWithType = this.#offers.find((offer) => (offer.type === itemsTripEvent.type));
+    for (let j = 0; j < this.#offersWithType.offers.length; j++) {
+      render(new OfferItemTripEventView(this.#offersWithType.offers[j], itemsTripEvent.offers), itemTripEventForOffersElement);
+    }
+  }
 
-      for (let j = 0; j < this.useOffersId.length; j++) {
-        this.offersWithType = this.offers.find((offer) => (offer.type === this.recorsTripEvents[i].type));
-        const useOffer = this.offersWithType['offers'].find(this.isUseOffer(this.useOffersId[j]));
-        render(new OfferItemTripEventView(useOffer), itemTripEventForOffersElement);
+  #renderEditTripEventOffers (itemTripEventView, itemsTripEvent) {
+    const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__available-offers');
+    this.#offersWithType = this.#offers.find((offer) => (offer.type === itemsTripEvent.type));
+    for (let j = 0; j < this.#offersWithType.offers.length; j++) {
+      render(new OfferEditTripEventView(this.#offersWithType.offers[j], itemsTripEvent.offers), itemTripEventForOffersElement);
+    }
+  }
+
+  #renderItemTripEvent (itemTripEvent) {
+    const itemTripEventView = new ItemTripEventView(itemTripEvent);
+    this.#renderItemTripEventOffers(itemTripEventView, itemTripEvent);
+    const editTripEvenView = new EditTripEvenView(itemTripEvent);
+    this.#renderEditTripEventOffers(editTripEvenView, itemTripEvent);
+
+    const replaceItemToEdit = () => {
+      this.#listTripEvents.element.replaceChild(editTripEvenView.element, itemTripEventView.element);
+    };
+
+    const replaceEditToItem = () => {
+      this.#listTripEvents.element.replaceChild(itemTripEventView.element, editTripEvenView.element);
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        replaceEditToItem();
+        document.removeEventListener('keydown', onEscKeyDown);
       }
+    };
 
-    }
+    itemTripEventView.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replaceItemToEdit();
+      document.addEventListener('keydown', onEscKeyDown);
+    });
 
-  };
+    editTripEvenView.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replaceEditToItem();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    editTripEvenView.element.querySelector('form').addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      replaceEditToItem();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    render(itemTripEventView, this.#listTripEvents.element);
+  }
 
 }
