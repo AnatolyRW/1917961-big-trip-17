@@ -14,11 +14,16 @@ export default class MainPresenter {
   #itemsTripEvents = null;
   #offers = null;
 
+  constructor() {
+
+  }
+
   init = (tripEventsTable, itemsTripEvents, TripEventTypesOffers) => {
     this.#itemsTripEvents = [...itemsTripEvents.tripEvents];
     this.#offers = [...TripEventTypesOffers.offers];
 
     render(new SortTripEventsView(), tripEventsTable);
+
     render(this.#listTripEvents, tripEventsTable);
 
     for (let i = 0; i < this.#itemsTripEvents.length; i++) {
