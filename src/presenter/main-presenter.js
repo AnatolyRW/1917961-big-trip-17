@@ -44,7 +44,6 @@ export default class MainPresenter {
 
   }
 
-
   #renderItemTripEventOffers (itemTripEventView, itemsTripEvent) {
     const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__selected-offers');
     this.#offersWithType = this.#offers.find((offer) => (offer.type === itemsTripEvent.type));

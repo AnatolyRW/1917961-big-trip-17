@@ -10,6 +10,5 @@ const tripEventsTable = siteMainElement.querySelector('.trip-events');
 const tripEventTypesOffersModel = new TripEventTypesOffersModel();
 const itemsTripEvents = new ItemsTripEventsModel(tripEventTypesOffersModel);
 const mainPresenter = new MainPresenter(tripEventsTable, itemsTripEvents, tripEventTypesOffersModel);
-//const mainPresenter = new MainPresenter(tripEventsTable, null, tripEventTypesOffersModel);
 
 mainPresenter.init();
