@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createEditTripEventTemplate = (tripEvent) => {
   const {basePrice,
@@ -122,28 +122,37 @@ const createEditTripEventTemplate = (tripEvent) => {
 `);
 };
 
-export default class TripEventEditView {
+export default class TripEventEditView extends AbstractView {
 
   #tripEvent = null;
-  #element = null;
 
   constructor(tripEvent) {
+    super();
     this.#tripEvent = tripEvent;
   }
 
-  get temlate() {
+  get template() {
     return createEditTripEventTemplate(this.#tripEvent);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.temlate);
-    }
-    return this.#element;
-  }
+  setRollupEditClickHandler = (callback) => {
+    this._callback.rollupEditClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollupEditClickHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #rollupEditClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.rollupEditClick();
+  };
+
+  setSubmitEditHandler = (callback) => {
+    this._callback.submitEdit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#submitEditHandler);
+  };
+
+  #submitEditHandler =(evt) => {
+    evt.preventDefault();
+    this._callback.rollupEditClick();
+  };
 
 }

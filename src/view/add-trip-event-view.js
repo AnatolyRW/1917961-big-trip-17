@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createAddTripEventTemplate = () => (`
   <form class="event event--edit" action="#" method="post">
@@ -163,23 +163,10 @@ const createAddTripEventTemplate = () => (`
   </form>
 `);
 
-export default class AddTripEventView {
+export default class AddTripEventView extends AbstractView {
 
-  #element = null;
-
-  get temlate() {
+  get template() {
     return createAddTripEventTemplate();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.temlate);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 
 }

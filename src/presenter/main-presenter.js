@@ -1,5 +1,5 @@
 import './filter-presenter.js';
-import { render } from '../render.js';
+import { render, replace } from '../framework/render.js';
 import SortTripEventsView from '../view/sort-trip-events-view.js';
 import ListTripEventsView from '../view/list-trip-events-view.js';
 import ItemTripEventView from '../view/item-trip-event-view.js';
@@ -67,11 +67,13 @@ export default class MainPresenter {
     this.#renderEditTripEventOffers(editTripEvenView, itemTripEvent);
 
     const replaceItemToEdit = () => {
-      this.#listTripEvents.element.replaceChild(editTripEvenView.element, itemTripEventView.element);
+      //this.#listTripEvents.element.replaceChild(editTripEvenView.element, itemTripEventView.element);
+      replace(editTripEvenView, itemTripEventView);
     };
 
     const replaceEditToItem = () => {
-      this.#listTripEvents.element.replaceChild(itemTripEventView.element, editTripEvenView.element);
+      //this.#listTripEvents.element.replaceChild(itemTripEventView.element, editTripEvenView.element);
+      replace(itemTripEventView, editTripEvenView);
     };
 
     const onEscKeyDown = (evt) => {
@@ -82,17 +84,17 @@ export default class MainPresenter {
       }
     };
 
-    itemTripEventView.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    itemTripEventView.setRolloutEditClickHandler(() => {
       replaceItemToEdit();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    editTripEvenView.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    editTripEvenView.setRollupEditClickHandler(() => {
       replaceEditToItem();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    editTripEvenView.element.querySelector('form').addEventListener('submit', (evt) => {
+    editTripEvenView.setSubmitEditHandler((evt) => {
       evt.preventDefault();
       replaceEditToItem();
       document.removeEventListener('keydown', onEscKeyDown);
