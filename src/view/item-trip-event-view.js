@@ -1,5 +1,6 @@
-import { createElement } from '../render.js';
 import { getDurationDates } from '../util.js';
+import AbstractView from '../framework/view/abstract-view.js';
+
 
 const createItemTrioEventTemplate = (tripEvent) => {
   const {basePrice,
@@ -45,28 +46,27 @@ const createItemTrioEventTemplate = (tripEvent) => {
 `);
 };
 
-export default class ItemTripEventView {
+export default class ItemTripEventView extends AbstractView {
 
   #tripEvent = null;
-  #element = null;
 
   constructor(tripEvent) {
+    super();
     this.#tripEvent = tripEvent;
   }
 
-  get temlate() {
+  get template() {
     return createItemTrioEventTemplate(this.#tripEvent);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.temlate);
-    }
-    return this.#element;
-  }
+  setRolloutEditClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rolloutEditClickHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #rolloutEditClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 
 }

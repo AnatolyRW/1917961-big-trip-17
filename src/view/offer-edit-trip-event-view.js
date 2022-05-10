@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createOfferEditTripEventTemplate = (offer, useOffers) => {
   const isUseOffer = useOffers.find((id) => offer.id === id);
@@ -13,30 +13,19 @@ const createOfferEditTripEventTemplate = (offer, useOffers) => {
   </div>
 `);};
 
-export default class OfferEditTripEventView {
+export default class OfferEditTripEventView extends AbstractView{
 
   #offer = null;
   #useOffers = null;
-  #element = null;
 
   constructor(offer, useOffers ) {
+    super();
     this.#offer = offer;
     this.#useOffers = useOffers;
   }
 
-  get temlate() {
+  get template() {
     return createOfferEditTripEventTemplate(this.#offer, this.#useOffers);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.temlate);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 
 }
