@@ -49,6 +49,7 @@ const createItemTrioEventTemplate = (tripEvent) => {
 export default class ItemTripEventView extends AbstractView {
 
   #tripEvent = null;
+  //#container = null;
 
   constructor(tripEvent) {
     super();
@@ -68,5 +69,10 @@ export default class ItemTripEventView extends AbstractView {
     evt.preventDefault();
     this._callback.click();
   };
+
+  static get Container () {
+    const siteMainElement = document.querySelector('.page-body__page-main');
+    return siteMainElement.querySelector('.trip-events');
+  }
 
 }

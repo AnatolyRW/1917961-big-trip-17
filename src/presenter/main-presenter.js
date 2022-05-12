@@ -16,8 +16,8 @@ export default class MainPresenter {
   #itemsTripEvents = null;
   #offers = null;
 
-  constructor(tripEventsContainer, itemsTripEvents, TripEventTypesOffers) {
-    this.#tripEventsContainer = tripEventsContainer;
+  constructor(containerElement, itemsTripEvents, TripEventTypesOffers) {
+    this.#tripEventsContainer = containerElement;
 
     if (itemsTripEvents) {
       this.#itemsTripEvents = [...itemsTripEvents.tripEvents];
@@ -67,12 +67,10 @@ export default class MainPresenter {
     this.#renderEditTripEventOffers(editTripEvenView, itemTripEvent);
 
     const replaceItemToEdit = () => {
-      //this.#listTripEvents.element.replaceChild(editTripEvenView.element, itemTripEventView.element);
       replace(editTripEvenView, itemTripEventView);
     };
 
     const replaceEditToItem = () => {
-      //this.#listTripEvents.element.replaceChild(itemTripEventView.element, editTripEvenView.element);
       replace(itemTripEventView, editTripEvenView);
     };
 

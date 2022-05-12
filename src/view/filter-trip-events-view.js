@@ -27,5 +27,9 @@ export default class FilterTripEventsView extends AbstractView {
     return createFilterTemplate();
   }
 
+  static get container () {
+    return document.querySelector('.trip-controls__filters');
+  }
+
 }
 
