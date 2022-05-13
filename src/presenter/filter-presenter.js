@@ -1,14 +1,29 @@
 import FilterTripEventsView from '../view/filter-trip-events-view';
+import MainPresenter from './main-presenter.js';
 import { render } from '../framework/render.js';
 
-const tripControlsFiltersElement = document.querySelector('.trip-controls__filters');
-
 export default class FilterPresenter {
-  constructor(containerElement, itemsTripEvents, TripEventTypesOffers) {
-    this.tripControlsFiltersElement = containerElement;
+
+  #filterTripEvents = null;
+  #itemsTripEvents = null;
+  #tripEventTypesOffers = null;
+  #mainPresenter = null;
+
+  constructor(itemsTripEvents, tripEventTypesOffers) {
+    this.#filterTripEvents = new FilterTripEventsView();
+    this.#itemsTripEvents = itemsTripEvents;
+    this.#tripEventTypesOffers = tripEventTypesOffers;
   }
 
   init () {
-    render(new FilterTripEventsView, this.tripControlsFiltersElement);
+    this.#renderFilterTripEvents();
+    this.#mainPresenter = new MainPresenter(this.#itemsTripEvents, this.#tripEventTypesOffers);
+    this.#mainPresenter.init();
   }
+
+  #renderFilterTripEvents () {
+    render(this.#filterTripEvents, this.#filterTripEvents.container);
+
+  }
+
 }

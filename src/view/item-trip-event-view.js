@@ -49,7 +49,6 @@ const createItemTrioEventTemplate = (tripEvent) => {
 export default class ItemTripEventView extends AbstractView {
 
   #tripEvent = null;
-  //#container = null;
 
   constructor(tripEvent) {
     super();

@@ -16,7 +16,7 @@ const createFilterTemplate = () => (`
       <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" checked>
       <label class="trip-filters__filter-label" for="filter-past">Past</label>
     </div>
-  
+
     <button class="visually-hidden" type="submit">Accept filter</button>
   </form>
 `);
@@ -27,7 +27,37 @@ export default class FilterTripEventsView extends AbstractView {
     return createFilterTemplate();
   }
 
-  static get container () {
+  setEverythingClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('#filter-everything').addEventListener('click', this.#everythingClickHandler);
+  };
+
+  #everythingClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
+
+  setFutureClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('#filter-future').addEventListener('click', this.#futureClickHandler);
+  };
+
+  #futureClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
+
+  setPastClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('#filter-past').addEventListener('click', this.#pastClickHandler);
+  };
+
+  #pastClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
+
+  get container () {
     return document.querySelector('.trip-controls__filters');
   }
 

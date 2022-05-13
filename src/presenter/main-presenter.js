@@ -15,9 +15,10 @@ export default class MainPresenter {
   #offersWithType = null;
   #itemsTripEvents = null;
   #offers = null;
+  #sortTripEvents = null;
+  #noTripEvents = null;
 
-  constructor(containerElement, itemsTripEvents, TripEventTypesOffers) {
-    this.#tripEventsContainer = containerElement;
+  constructor(itemsTripEvents, TripEventTypesOffers) {
 
     if (itemsTripEvents) {
       this.#itemsTripEvents = [...itemsTripEvents.tripEvents];
@@ -28,18 +29,20 @@ export default class MainPresenter {
     }
 
     this.#listTripEvents = new ListTripEventsView();
+    this.#sortTripEvents = new SortTripEventsView();
+    this.#noTripEvents = new NoTripEventsView();
   }
 
   init() {
     if (this.#itemsTripEvents) {
-      render(new SortTripEventsView(), this.#tripEventsContainer);
-      render(this.#listTripEvents, this.#tripEventsContainer);
+      render(this.#sortTripEvents , this.#sortTripEvents.container);
+      render(this.#listTripEvents, this.#listTripEvents.container);
 
       for (let i = 0; i < this.#itemsTripEvents.length; i++) {
         this.#renderItemTripEvent(this.#itemsTripEvents[i]);
       }
     } else {
-      render(new NoTripEventsView(), this.#tripEventsContainer);
+      render(this.#noTripEvents, this.#noTripEvents.container);
     }
 
   }
