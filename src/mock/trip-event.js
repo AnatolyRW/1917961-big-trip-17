@@ -1,6 +1,8 @@
 import { TRIP_EVENT_TYPES, DESCRIPTION_CITYS, NAME_CITYS, MAX_COUNT_LINE_DESCRIPTION_CITY, MAX_COUNT_PICTURE, MAX_PRICE } from './const.js';
 import { getRandomInteger, deleteRandomValueFromArray } from '../util.js';
 import dayjs from 'dayjs';
+import utc  from 'dayjs/plugin/utc.js';
+dayjs.extend(utc);
 
 
 const generateDescriptionCity = () => {
@@ -42,7 +44,7 @@ const generateOffer = (offers) => {
 };
 
 const generateDateFrom = () => {
-  const maxDaysGap = 3;
+  const maxDaysGap = 7;
   const daysGap = getRandomInteger(-maxDaysGap, maxDaysGap);
   return dayjs().add(daysGap, 'day');
 };

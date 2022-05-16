@@ -4,7 +4,7 @@ dayjs.extend(duration);
 
 const getRandomInteger = (beginInteger, endInteger) => {
   const rangeInteger = Math.abs(endInteger - beginInteger) + 1;
-  return Math.floor(Math.random() * (rangeInteger) + Math.min(beginInteger, endInteger)) - beginInteger;
+  return Math.floor(Math.random() * (rangeInteger) + Math.min(beginInteger, endInteger));
 };
 
 const checkLengthString = (stringCheck, maxLengthString) => maxLengthString >= stringCheck.length;

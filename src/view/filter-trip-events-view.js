@@ -1,19 +1,19 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const createFilterTemplate = () => (`
+const createFilterTemplate = (idFilter) => (`
   <form class="trip-filters" action="#" method="get">
     <div class="trip-filters__filter">
-      <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything">
+      <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" ${idFilter === 'filter-everything' ? 'checked' : ''}>
       <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
     </div>
 
     <div class="trip-filters__filter">
-      <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future">
+      <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future" ${idFilter === 'filter-future' ? 'checked' : ''}>
       <label class="trip-filters__filter-label" for="filter-future">Future</label>
     </div>
 
     <div class="trip-filters__filter">
-      <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" checked>
+      <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" ${idFilter === 'filter-past' ? 'checked' : ''}>
       <label class="trip-filters__filter-label" for="filter-past">Past</label>
     </div>
 
@@ -23,38 +23,30 @@ const createFilterTemplate = () => (`
 
 export default class FilterTripEventsView extends AbstractView {
 
-  get template() {
-    return createFilterTemplate();
+  #idFilter = null;
+
+  constructor () {
+    super();
+    this.#idFilter = 'filter-everything';
   }
 
-  setEverythingClickHandler = (callback) => {
-    this._callback.click = callback;
-    this.element.querySelector('#filter-everything').addEventListener('click', this.#everythingClickHandler);
+  get template() {
+    return createFilterTemplate(this.#idFilter);
+  }
+
+  get idFilter () {
+    return this.#idFilter;
+  }
+
+  setFilterChangeHandler = (callback) => {
+    this._callback.change = callback;
+    this.element.addEventListener('change', this.#filterChangeHandler);
   };
 
-  #everythingClickHandler = (evt) => {
+  #filterChangeHandler = (evt) => {
+    this.#idFilter = evt.target.id;
     evt.preventDefault();
-    this._callback.click();
-  };
-
-  setFutureClickHandler = (callback) => {
-    this._callback.click = callback;
-    this.element.querySelector('#filter-future').addEventListener('click', this.#futureClickHandler);
-  };
-
-  #futureClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.click();
-  };
-
-  setPastClickHandler = (callback) => {
-    this._callback.click = callback;
-    this.element.querySelector('#filter-past').addEventListener('click', this.#pastClickHandler);
-  };
-
-  #pastClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.click();
+    this._callback.change();
   };
 
   get container () {

@@ -1,5 +1,5 @@
 import './filter-presenter.js';
-import { render, replace } from '../framework/render.js';
+import { remove, render, replace } from '../framework/render.js';
 import SortTripEventsView from '../view/sort-trip-events-view.js';
 import ListTripEventsView from '../view/list-trip-events-view.js';
 import ItemTripEventView from '../view/item-trip-event-view.js';
@@ -8,48 +8,52 @@ import OfferItemTripEventView from '../view/offer-item-trip-event-view.js';
 import OfferEditTripEventView from '../view/offer-edit-trip-event-view.js';
 import NoTripEventsView from '../view/no-trip-events-view.js';
 
-export default class MainPresenter {
+export default class ItemTripEventPresenter {
 
-  #tripEventsContainer = null;
-  #listTripEvents = null;
+  #listTripEventsView = null;
+  #sortTripEventsView = null;
+  #noTripEventsView = null;
+  #itemsTripEventsView = [];
+
   #offersWithType = null;
-  #itemsTripEvents = null;
-  #offers = null;
-  #sortTripEvents = null;
-  #noTripEvents = null;
+  #itemsTripEventsModel = null;
+  #offersModel = null;
 
-  constructor(itemsTripEvents, TripEventTypesOffers) {
+  constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
 
-    if (itemsTripEvents) {
-      this.#itemsTripEvents = [...itemsTripEvents.tripEvents];
-    }
+    this.#itemsTripEventsModel = itemsTripEventsModel;
+    this.#offersModel = TripEventTypesOffersModel;
 
-    if (TripEventTypesOffers) {
-      this.#offers = [...TripEventTypesOffers.offers];
-    }
+    this.#listTripEventsView = new ListTripEventsView();
+    this.#sortTripEventsView = new SortTripEventsView();
+    this.#noTripEventsView = new NoTripEventsView();
+  }
 
-    this.#listTripEvents = new ListTripEventsView();
-    this.#sortTripEvents = new SortTripEventsView();
-    this.#noTripEvents = new NoTripEventsView();
+  get itemsTripEventsModel () {
+    return this.#itemsTripEventsModel;
+  }
+
+  set itemsTripEventsModel (itemsTripEventsModel) {
+    this.#itemsTripEventsModel = itemsTripEventsModel;
   }
 
   init() {
-    if (this.#itemsTripEvents) {
-      render(this.#sortTripEvents , this.#sortTripEvents.container);
-      render(this.#listTripEvents, this.#listTripEvents.container);
+    if (this.#itemsTripEventsModel) {
+      render(this.#sortTripEventsView , this.#sortTripEventsView.container);
+      render(this.#listTripEventsView, this.#listTripEventsView.container);
 
-      for (let i = 0; i < this.#itemsTripEvents.length; i++) {
-        this.#renderItemTripEvent(this.#itemsTripEvents[i]);
+      for (let i = 0; i < this.#itemsTripEventsModel.length; i++) {
+        this.#renderItemTripEvent(this.#itemsTripEventsModel[i]);
       }
     } else {
-      render(this.#noTripEvents, this.#noTripEvents.container);
+      render(this.#noTripEventsView, this.#noTripEventsView.container);
     }
 
   }
 
   #renderItemTripEventOffers(itemTripEventView, itemsTripEvent) {
     const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__selected-offers');
-    this.#offersWithType = this.#offers.find((offer) => (offer.type === itemsTripEvent.type));
+    this.#offersWithType = this.#offersModel.find((offer) => (offer.type === itemsTripEvent.type));
     for (let j = 0; j < this.#offersWithType.offers.length; j++) {
       render(new OfferItemTripEventView(this.#offersWithType.offers[j], itemsTripEvent.offers), itemTripEventForOffersElement);
     }
@@ -57,7 +61,7 @@ export default class MainPresenter {
 
   #renderEditTripEventOffers(itemTripEventView, itemsTripEvent) {
     const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__available-offers');
-    this.#offersWithType = this.#offers.find((offer) => (offer.type === itemsTripEvent.type));
+    this.#offersWithType = this.#offersModel.find((offer) => (offer.type === itemsTripEvent.type));
     for (let j = 0; j < this.#offersWithType.offers.length; j++) {
       render(new OfferEditTripEventView(this.#offersWithType.offers[j], itemsTripEvent.offers), itemTripEventForOffersElement);
     }
@@ -65,6 +69,8 @@ export default class MainPresenter {
 
   #renderItemTripEvent(itemTripEvent) {
     const itemTripEventView = new ItemTripEventView(itemTripEvent);
+    this.#itemsTripEventsView.push(itemTripEventView);
+
     this.#renderItemTripEventOffers(itemTripEventView, itemTripEvent);
     const editTripEvenView = new EditTripEvenView(itemTripEvent);
     this.#renderEditTripEventOffers(editTripEvenView, itemTripEvent);
@@ -74,7 +80,7 @@ export default class MainPresenter {
     };
 
     const replaceEditToItem = () => {
-      replace(itemTripEventView, editTripEvenView);
+      replace(this.#itemsTripEventsView, editTripEvenView);
     };
 
     const onEscKeyDown = (evt) => {
@@ -101,7 +107,12 @@ export default class MainPresenter {
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    render(itemTripEventView, this.#listTripEvents.element);
+    render(itemTripEventView, this.#listTripEventsView.element);
   }
 
+  removeItemTripEvent() {
+    for (let i = 0; i < this.#itemsTripEventsView.length; i++) {
+      remove(this.#itemsTripEventsView[i]);
+    }
+  }
 }

@@ -6,7 +6,7 @@ export default class ItemsTripEventsModel {
   #tripEvents = null;
 
   constructor(tripEventTypesOffers) {
-    this.#tripEvents = Array.from({length: 5}, generateTripEvent(tripEventTypesOffers.offers));
+    this.#tripEvents = Array.from({length: 20}, generateTripEvent(tripEventTypesOffers.offers));
   }
 
   get tripEvents() {
