@@ -34,7 +34,6 @@ export default class FilterPresenter {
     render(this.#filterTripEvents, this.#filterTripEvents.container);
 
     const renderFilterChange = () => {
-      //remove(this.#filterTripEvents);
       render(this.#filterTripEvents, this.#filterTripEvents.container);
       switch(this.#filterTripEvents.idFilter) {
         case 'filter-future':
