@@ -69,4 +69,9 @@ export default class ItemTripEventView extends AbstractView {
     this._callback.click();
   };
 
+  static get Container () {
+    const siteMainElement = document.querySelector('.page-body__page-main');
+    return siteMainElement.querySelector('.trip-events');
+  }
+
 }

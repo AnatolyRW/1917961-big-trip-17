@@ -8,4 +8,9 @@ export default class ListTripEventsView extends AbstractView {
     return createListTripEventsTemplate();
   }
 
+  get container () {
+    const siteMainElement = document.querySelector('.page-body__page-main');
+    return siteMainElement.querySelector('.trip-events');
+  }
+
 }

@@ -15,4 +15,9 @@ export default class NoTripEventsView extends AbstractView{
     return createNoTripEventsTemplate();
   }
 
+  get container() {
+    const siteMainElement = document.querySelector('.page-body__page-main');
+    return siteMainElement.querySelector('.trip-events');
+  }
+
 }
