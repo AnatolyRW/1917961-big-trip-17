@@ -1,6 +1,19 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const createNoTripEventsTemplate = () => '<p class="trip-events__msg">Click New Event to create your first point</p>';
+const createNoTripEventsTemplate = (typeFilter) => {
+  let str = '';
+  switch(typeFilter) {
+    case 'filter-future':
+      str = 'There are no future events now';
+      break;
+    case 'filter-past':
+      str = 'There are no past events now';
+      break;
+    default:
+      str = 'Click New Event to create your first point';
+  }
+  return `<p class="trip-events__msg">${str}</p>`;
+};
 
 /*
 Значение отображаемого текста зависит от выбранного фильтра:
@@ -11,8 +24,23 @@ const createNoTripEventsTemplate = () => '<p class="trip-events__msg">Click New 
 
 export default class NoTripEventsView extends AbstractView{
 
+  #idFilter = null;
+
+  constructor () {
+    super();
+    this.#idFilter = 'filter-everything';
+  }
+
+  get idFilter () {
+    return this.#idFilter;
+  }
+
+  set idFilter (typeFilter) {
+    this.#idFilter = typeFilter;
+  }
+
   get template() {
-    return createNoTripEventsTemplate();
+    return createNoTripEventsTemplate(this.#idFilter);
   }
 
   get container() {
