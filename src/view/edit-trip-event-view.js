@@ -155,4 +155,8 @@ export default class TripEventEditView extends AbstractView {
     this._callback.rollupEditClick();
   };
 
+  get containerOffersElement() {
+    return this.element.querySelector('.event__available-offers');
+  }
+
 }

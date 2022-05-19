@@ -4,9 +4,9 @@ import SortTripEventsView from '../view/sort-trip-events-view.js';
 import ListTripEventsView from '../view/list-trip-events-view.js';
 import ItemTripEventView from '../view/item-trip-event-view.js';
 import EditTripEvenView from '../view/edit-trip-event-view.js';
-import OfferItemTripEventView from '../view/offer-item-trip-event-view.js';
-import OfferEditTripEventView from '../view/offer-edit-trip-event-view.js';
 import NoTripEventsView from '../view/no-trip-events-view.js';
+import OffersItemTripEventsPresenter from './offers-item-trip-event-presenter.js';
+import OffersEditTripEventsPresenter from './offers-edit-trip-event-presenter';
 
 export default class ItemTripEventPresenter {
 
@@ -54,29 +54,15 @@ export default class ItemTripEventPresenter {
 
   }
 
-  #renderItemTripEventOffers(itemTripEventView, itemsTripEvent) {
-    const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__selected-offers');
-    this.#offersWithType = this.#offersModel.find((offer) => (offer.type === itemsTripEvent.type));
-    for (let j = 0; j < this.#offersWithType.offers.length; j++) {
-      render(new OfferItemTripEventView(this.#offersWithType.offers[j], itemsTripEvent.offers), itemTripEventForOffersElement);
-    }
-  }
-
-  #renderEditTripEventOffers(itemTripEventView, itemsTripEvent) {
-    const itemTripEventForOffersElement = itemTripEventView.element.querySelector('.event__available-offers');
-    this.#offersWithType = this.#offersModel.find((offer) => (offer.type === itemsTripEvent.type));
-    for (let j = 0; j < this.#offersWithType.offers.length; j++) {
-      render(new OfferEditTripEventView(this.#offersWithType.offers[j], itemsTripEvent.offers), itemTripEventForOffersElement);
-    }
-  }
-
-  #renderItemTripEvent(itemTripEvent) {
-    const itemTripEventView = new ItemTripEventView(itemTripEvent);
+  #renderItemTripEvent(itemTripEventModel) {
+    const itemTripEventView = new ItemTripEventView(itemTripEventModel);
+    const offersItemTripEventsPresenter = new OffersItemTripEventsPresenter(this.#offersModel);
+    offersItemTripEventsPresenter.init(itemTripEventView, itemTripEventModel);
     this.#itemsTripEventsView.push(itemTripEventView);
 
-    this.#renderItemTripEventOffers(itemTripEventView, itemTripEvent);
-    const editTripEvenView = new EditTripEvenView(itemTripEvent);
-    this.#renderEditTripEventOffers(editTripEvenView, itemTripEvent);
+    const editTripEvenView = new EditTripEvenView(itemTripEventModel);
+    const offersEditTripEventsPresenter = new OffersEditTripEventsPresenter(this.#offersModel);
+    offersEditTripEventsPresenter.init(editTripEvenView, itemTripEventModel);
 
     const replaceItemToEdit = () => {
       replace(editTripEvenView, itemTripEventView);

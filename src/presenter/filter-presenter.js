@@ -2,7 +2,7 @@ import FilterTripEventsView from '../view/filter-trip-events-view';
 import ItemTripEventPresenter from './item-trip-event-presenter.js';
 import { render } from '../framework/render.js';
 import dayjs from 'dayjs';
-import utc  from 'dayjs/plugin/utc.js';
+import utc from 'dayjs/plugin/utc.js';
 dayjs.extend(utc);
 
 export default class FilterPresenter {
@@ -13,29 +13,31 @@ export default class FilterPresenter {
   #itemTripEventPresenter = null;
 
   constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
+
     this.#filterTripEventsView = new FilterTripEventsView();
+
     if (itemsTripEventsModel) {
-      this.#itemsTripEventsModel = [...itemsTripEventsModel.tripEvents];
+      this.#itemsTripEventsModel = itemsTripEventsModel;
     }
 
     if (TripEventTypesOffersModel) {
-      this.#offersModel = [...TripEventTypesOffersModel.offers];
+      this.#offersModel = TripEventTypesOffersModel;
     }
   }
 
-  init () {
+  init() {
     this.#renderFilterTripEvents();
-    this.#itemTripEventPresenter = new ItemTripEventPresenter(this.#itemsTripEventsModel, this.#offersModel);
-    this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
+    //this.#itemTripEventPresenter = new ItemTripEventPresenter(this.#itemsTripEventsModel, this.#offersModel);
+    //this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
   }
 
-  #renderFilterTripEvents () {
+  #renderFilterTripEvents() {
 
     render(this.#filterTripEventsView, this.#filterTripEventsView.container);
 
     const renderFilterChange = () => {
       render(this.#filterTripEventsView, this.#filterTripEventsView.container);
-      switch(this.#filterTripEventsView.idFilter) {
+      switch (this.#filterTripEventsView.idFilter) {
         case 'filter-future':
           this.#itemTripEventPresenter.itemsTripEventsModel = this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo));
           this.#itemTripEventPresenter.removeItemTripEvent();
@@ -57,6 +59,10 @@ export default class FilterPresenter {
       renderFilterChange();
     });
 
+  }
+
+  get filterTripEventsView() {
+    return this.#filterTripEventsView;
   }
 
 }
