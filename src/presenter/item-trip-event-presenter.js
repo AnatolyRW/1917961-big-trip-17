@@ -16,7 +16,7 @@ export default class ItemTripEventPresenter {
   #itemsTripEventsView = [];
 
   #offersWithType = null;
-  #itemsTripEventsModel = null;
+  #itemsTripEventsModel = [];
   #offersModel = null;
 
   constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
@@ -37,8 +37,10 @@ export default class ItemTripEventPresenter {
     this.#itemsTripEventsModel = itemsTripEventsModel;
   }
 
-  init() {
-    if (this.#itemsTripEventsModel) {
+  init(idFilter) {
+    remove(this.#noTripEventsView);
+
+    if (this.#itemsTripEventsModel.length) {
       render(this.#sortTripEventsView , this.#sortTripEventsView.container);
       render(this.#listTripEventsView, this.#listTripEventsView.container);
 
@@ -46,6 +48,7 @@ export default class ItemTripEventPresenter {
         this.#renderItemTripEvent(this.#itemsTripEventsModel[i]);
       }
     } else {
+      this.#noTripEventsView.idFilter = idFilter;
       render(this.#noTripEventsView, this.#noTripEventsView.container);
     }
 
@@ -80,7 +83,7 @@ export default class ItemTripEventPresenter {
     };
 
     const replaceEditToItem = () => {
-      replace(this.#itemsTripEventsView, editTripEvenView);
+      replace(itemTripEventView, editTripEvenView);
     };
 
     const onEscKeyDown = (evt) => {

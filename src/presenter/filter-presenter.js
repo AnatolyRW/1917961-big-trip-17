@@ -7,13 +7,13 @@ dayjs.extend(utc);
 
 export default class FilterPresenter {
 
-  #filterTripEvents = null;
+  #filterTripEventsView = null;
   #itemsTripEventsModel = null;
   #offersModel = null;
   #itemTripEventPresenter = null;
 
   constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
-    this.#filterTripEvents = new FilterTripEventsView();
+    this.#filterTripEventsView = new FilterTripEventsView();
     if (itemsTripEventsModel) {
       this.#itemsTripEventsModel = [...itemsTripEventsModel.tripEvents];
     }
@@ -26,34 +26,34 @@ export default class FilterPresenter {
   init () {
     this.#renderFilterTripEvents();
     this.#itemTripEventPresenter = new ItemTripEventPresenter(this.#itemsTripEventsModel, this.#offersModel);
-    this.#itemTripEventPresenter.init();
+    this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
   }
 
   #renderFilterTripEvents () {
 
-    render(this.#filterTripEvents, this.#filterTripEvents.container);
+    render(this.#filterTripEventsView, this.#filterTripEventsView.container);
 
     const renderFilterChange = () => {
-      render(this.#filterTripEvents, this.#filterTripEvents.container);
-      switch(this.#filterTripEvents.idFilter) {
+      render(this.#filterTripEventsView, this.#filterTripEventsView.container);
+      switch(this.#filterTripEventsView.idFilter) {
         case 'filter-future':
           this.#itemTripEventPresenter.itemsTripEventsModel = this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo));
           this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init();
+          this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
           break;
         case 'filter-past':
           this.#itemTripEventPresenter.itemsTripEventsModel = this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isAfter(itemTripEventModel.dateFrom));
           this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init();
+          this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
           break;
         default:
           this.#itemTripEventPresenter.itemsTripEventsModel = this.#itemsTripEventsModel;
           this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init();
+          this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
       }
     };
 
-    this.#filterTripEvents.setFilterChangeHandler(() => {
+    this.#filterTripEventsView.setFilterChangeHandler(() => {
       renderFilterChange();
     });
 
