@@ -1,107 +1,90 @@
-import './filter-presenter.js';
 import { remove, render, replace } from '../framework/render.js';
-import SortTripEventsView from '../view/sort-trip-events-view.js';
-import ListTripEventsView from '../view/list-trip-events-view.js';
 import ItemTripEventView from '../view/item-trip-event-view.js';
 import EditTripEvenView from '../view/edit-trip-event-view.js';
-import NoTripEventsView from '../view/no-trip-events-view.js';
-import OffersItemTripEventsPresenter from './offers-item-trip-event-presenter.js';
-import OffersEditTripEventsPresenter from './offers-edit-trip-event-presenter';
+import OffersItemTripEventPresenter from './offers-item-trip-event-presenter.js';
+import OffersEditTripEventPresenter from './offers-edit-trip-event-presenter';
 
 export default class ItemTripEventPresenter {
 
-  #listTripEventsView = null;
-  #sortTripEventsView = null;
-  #noTripEventsView = null;
-  #itemsTripEventsView = [];
+  #container = null;
+  #itemTripEventView = null;
+  #editTripEvenView = null;
 
-  #offersWithType = null;
-  #itemsTripEventsModel = [];
+  #tripEventModel = null;
   #offersModel = null;
 
-  constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
-
-    this.#itemsTripEventsModel = itemsTripEventsModel;
+  constructor(tripEventsModel, container, TripEventTypesOffersModel) {
+    this.#tripEventModel = tripEventsModel;
+    this.#container = container;
     this.#offersModel = TripEventTypesOffersModel;
-
-    this.#listTripEventsView = new ListTripEventsView();
-    this.#sortTripEventsView = new SortTripEventsView();
-    this.#noTripEventsView = new NoTripEventsView();
   }
 
-  get itemsTripEventsModel () {
-    return this.#itemsTripEventsModel;
+  get tripEventModel() {
+    return this.#tripEventModel;
   }
 
-  set itemsTripEventsModel (itemsTripEventsModel) {
-    this.#itemsTripEventsModel = itemsTripEventsModel;
+  set tripEventModel(itemsTripEventsModel) {
+    this.#tripEventModel = itemsTripEventsModel;
   }
 
-  init(idFilter) {
-    remove(this.#noTripEventsView);
-
-    if (this.#itemsTripEventsModel.length) {
-      render(this.#sortTripEventsView , this.#sortTripEventsView.container);
-      render(this.#listTripEventsView, this.#listTripEventsView.container);
-
-      for (let i = 0; i < this.#itemsTripEventsModel.length; i++) {
-        this.#renderItemTripEvent(this.#itemsTripEventsModel[i]);
-      }
-    } else {
-      this.#noTripEventsView.idFilter = idFilter;
-      render(this.#noTripEventsView, this.#noTripEventsView.container);
-    }
-
+  init() {
+    this.#itemTripEventView = new ItemTripEventView(this.#tripEventModel);
+    this.#renderOffersItemTripEvent();
+    this.#editTripEvenView = new EditTripEvenView(this.#tripEventModel);
+    this.#renderOffersEditTripEvent();
+    this.#renderItemTripEvent(this.#tripEventModel);
   }
 
-  #renderItemTripEvent(itemTripEventModel) {
-    const itemTripEventView = new ItemTripEventView(itemTripEventModel);
-    const offersItemTripEventsPresenter = new OffersItemTripEventsPresenter(this.#offersModel);
-    offersItemTripEventsPresenter.init(itemTripEventView, itemTripEventModel);
-    this.#itemsTripEventsView.push(itemTripEventView);
-
-    const editTripEvenView = new EditTripEvenView(itemTripEventModel);
-    const offersEditTripEventsPresenter = new OffersEditTripEventsPresenter(this.#offersModel);
-    offersEditTripEventsPresenter.init(editTripEvenView, itemTripEventModel);
-
-    const replaceItemToEdit = () => {
-      replace(editTripEvenView, itemTripEventView);
-    };
-
-    const replaceEditToItem = () => {
-      replace(itemTripEventView, editTripEvenView);
-    };
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        replaceEditToItem();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    itemTripEventView.setRolloutEditClickHandler(() => {
-      replaceItemToEdit();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    editTripEvenView.setRollupEditClickHandler(() => {
-      replaceEditToItem();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    editTripEvenView.setSubmitEditHandler((evt) => {
+  #onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      replaceEditToItem();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
+      this.#replaceEditToItem();
+      document.removeEventListener('keydown', this.#onEscKeyDown);
+    }
+  };
 
-    render(itemTripEventView, this.#listTripEventsView.element);
+  #replaceItemToEdit = () => {
+    replace(this.#editTripEvenView, this.#itemTripEventView);
+  };
+
+  #handleRolloutEditClick = () => {
+    this.#replaceItemToEdit();
+    document.addEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #replaceEditToItem = () => {
+    replace(this.#itemTripEventView, this.#editTripEvenView);
+  };
+
+  #handleRollupEditClick = () => {
+    this.#replaceEditToItem();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #handleSubmitEdit = (evt) => {
+    evt.preventDefault();
+    this.#replaceEditToItem();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #renderItemTripEvent() {
+    this.#itemTripEventView.setRolloutEditClickHandler(this.#handleRolloutEditClick);
+    this.#editTripEvenView.setRollupEditClickHandler(this.#handleRollupEditClick);
+    this.#editTripEvenView.setSubmitEditHandler(this.#handleSubmitEdit);
+    render(this.#itemTripEventView, this.#container.element);
   }
 
   removeItemTripEvent() {
-    for (let i = 0; i < this.#itemsTripEventsView.length; i++) {
-      remove(this.#itemsTripEventsView[i]);
-    }
+    remove(this.#itemTripEventView);
+  }
+
+  #renderOffersItemTripEvent() {
+    const offersItemTripEventPresenter = new OffersItemTripEventPresenter(this.#itemTripEventView, this.#tripEventModel);
+    offersItemTripEventPresenter.init(this.#offersModel);
+  }
+
+  #renderOffersEditTripEvent() {
+    const offersEditTripEventPresenter = new OffersEditTripEventPresenter(this.#editTripEvenView, this.#tripEventModel);
+    offersEditTripEventPresenter.init(this.#offersModel);
   }
 }

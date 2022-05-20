@@ -5,22 +5,26 @@ export default class OffersEditTripEventPresenter {
 
   #offersWithType = null;
   #offersModel = null;
+  #tripEventModel = null;
 
+  #tripEventView = null;
   #offerEditTripEventViews = [];
 
-  constructor(TripEventTypesOffersModel) {
+  constructor(tripEventView, tripEventModel) {
+    this.#tripEventView = tripEventView;
+    this.#tripEventModel = tripEventModel;
+  }
+
+  init(TripEventTypesOffersModel ) {
     this.#offersModel = TripEventTypesOffersModel;
+    this.#renderItemTripEventOffers();
   }
 
-  init(tripEventView, itemTripEventModel) {
-    this.#renderItemTripEventOffers(tripEventView, itemTripEventModel);
-  }
-
-  #renderItemTripEventOffers(tripEventView, itemsTripEventModel) {
-    this.#offersWithType = this.#offersModel.find((offer) => (offer.type === itemsTripEventModel.type));
+  #renderItemTripEventOffers() {
+    this.#offersWithType = this.#offersModel.find((offer) => (offer.type === this.#tripEventModel.type));
     for (let j = 0; j < this.#offersWithType.offers.length; j++) {
-      this.#offerEditTripEventViews.push(new OfferEditTripEventView(this.#offersWithType.offers[j], itemsTripEventModel.offers));
-      render(this.#offerEditTripEventViews[j], tripEventView.containerOffersElement);
+      this.#offerEditTripEventViews.push(new OfferEditTripEventView(this.#offersWithType.offers[j], this.#tripEventModel.offers));
+      render(this.#offerEditTripEventViews[j], this.#tripEventView.containerOffersElement);
     }
   }
 
