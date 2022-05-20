@@ -13,7 +13,7 @@ export default class MainPresenter {
   #noTripEventsView = new NoTripEventsView();
 
   #filterTripEventsPresenter = null;
-  #itemTripEventPresenters = [];
+  #itemTripEventPresenters = new Map();
 
   #itemsTripEventsModel = null;
   #offersModel = null;
@@ -26,13 +26,13 @@ export default class MainPresenter {
     if (TripEventTypesOffersModel) {
       this.#offersModel = [...TripEventTypesOffersModel.offers];
     }
+    this.#filterTripEventsPresenter = new FilterPresenter(this.#itemTripEventPresenters, this.#noTripEventsView);
   }
 
   init() {
     this.#renderSortTripEvents();
     this.#renderlistTripEvents();
     this.renderTripEventItems();
-    this.#filterTripEventsPresenter = new FilterPresenter(this.#itemTripEventPresenters);
     this.#filterTripEventsPresenter.init();
   }
 
@@ -44,16 +44,17 @@ export default class MainPresenter {
     render(this.#listTripEventsView, this.#listTripEventsView.container);
   }
 
-  renderTripEventItems(idFilter) {
-    if (this.#itemsTripEventsModel.length) {
-      this.#itemsTripEventsModel.forEach((element) => {
-        const itemTripEventPresenter = new ItemTripEventPresenter(element, this.#listTripEventsView, this.#offersModel);
-        itemTripEventPresenter.init();
-        this.#itemTripEventPresenters.push(itemTripEventPresenter);
-      });
-    } else {
-      this.#noTripEventsView.idFilter = idFilter;
+  #renderTripEventItem = (itemTripEventModel) => {
+    const itemTripEventPresenter = new ItemTripEventPresenter(this.#listTripEventsView, this.#offersModel);
+    itemTripEventPresenter.init(itemTripEventModel);
+    this.#itemTripEventPresenters.set(itemTripEventModel.id, itemTripEventPresenter);
+  };
+
+  renderTripEventItems() {
+    if (!this.#itemsTripEventsModel.length) {
       render(this.#noTripEventsView, this.#noTripEventsView.container);
+      return;
     }
+    this.#itemsTripEventsModel.forEach(this.#renderTripEventItem);
   }
 }

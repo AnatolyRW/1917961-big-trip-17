@@ -6,68 +6,73 @@ dayjs.extend(utc);
 
 export default class FilterPresenter {
 
-  #filterTripEventsView = null;
+  #filterTripEventsView = new FilterTripEventsView();
+  #noTripEventsView = null;
 
-  #itemsTripEventsModel = null;
   #itemTripEventPresenters = [];
-  #filterItemsTripEventsModel = [];
-  #offersModel = null;
+  #filterItemTripEventPresenters = [];
 
-  #itemTripEventPresenter = null;
-
-  constructor(itemTripEventPresenters) {
+  constructor(itemTripEventPresenters, noTripEventsView) {
     this.#itemTripEventPresenters = itemTripEventPresenters;
-  }
-
-  init() {
-    this.#renderFilterTripEvents();
-  }
-
-  #renderFilterTripEvents() {
-
-    render(this.#filterTripEventsView, this.#filterTripEventsView.container);
-
-    const renderFilterChange = () => {
-      render(this.#filterTripEventsView, this.#filterTripEventsView.container);
-      switch (this.#filterTripEventsView.idFilter) {
-        case 'filter-future':
-          this.#filterItemsTripEventsModel = this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo));
-          this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
-          break;
-        case 'filter-past':
-          this.#filterItemsTripEventsModel = this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isAfter(itemTripEventModel.dateFrom));
-          this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
-          break;
-        default:
-          this.#filterItemsTripEventsModel = this.#itemsTripEventsModel;
-          this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init(this.#filterTripEventsView.idFilter);
-      }
-    };
-
-    this.#filterTripEventsView.setFilterChangeHandler(() => {
-      renderFilterChange();
-    });
-
+    this.#noTripEventsView = noTripEventsView;
   }
 
   get filterTripEventsView() {
     return this.#filterTripEventsView;
   }
 
-  renderTripEventItems(idFilter) {
-    if (this.#filterItemsTripEventsModel.length) {
-      this.#filterItemsTripEventsModel.forEach((element) => {
-        const itemTripEventPresenter = new ItemTripEventPresenter(element, this.#listTripEventsView, this.#offersModel);
-        itemTripEventPresenter.init();
-        this.#itemTripEventPresenters.push(itemTripEventPresenter);
+  init() {
+    this.#filterItemTripEventPresenters = this.#itemTripEventPresenters;
+    this.#renderFilterTripEvents();
+  }
+
+  #applayFilterFuture = (itemTripEventPresenter) => dayjs().isBefore(itemTripEventPresenter.tripEventModel.dateTo);
+
+  #applayFilterPast = (itemTripEventPresenter) => dayjs().isAfter(itemTripEventPresenter.tripEventModel.dateFrom);
+
+  #renderFilterChange = () => {
+    render(this.#filterTripEventsView, this.#filterTripEventsView.container);
+    this.#removTripEventItems();
+    switch (this.#filterTripEventsView.idFilter) {
+      case 'filter-future':
+        this.#filterItemTripEventPresenters = this.#itemTripEventPresenters.filter(this.#applayFilterFuture);
+        break;
+      case 'filter-past':
+        this.#filterItemTripEventPresenters = this.#itemTripEventPresenters.filter(this.#applayFilterPast);
+        break;
+      case 'filter-everything':
+        this.#filterItemTripEventPresenters = this.#itemTripEventPresenters;
+        break;
+      default:
+        this.#filterItemTripEventPresenters = this.#itemTripEventPresenters;
+    }
+    this.#renderTripEventItems(this.#filterTripEventsView.idFilter);
+  };
+
+  #handleFilterChange = () => {
+    this.#renderFilterChange();
+  };
+
+  #renderFilterTripEvents() {
+    render(this.#filterTripEventsView, this.#filterTripEventsView.container);
+    this.#filterTripEventsView.setFilterChangeHandler(this.#handleFilterChange);
+  }
+
+  #renderTripEventItems(idFilter) {
+    if (this.#filterItemTripEventPresenters.length) {
+      this.#filterItemTripEventPresenters.forEach((element) => {
+        element.renderItemTripEvent();
       });
     } else {
       this.#noTripEventsView.idFilter = idFilter;
       render(this.#noTripEventsView, this.#noTripEventsView.container);
     }
+  }
+
+  #removTripEventItems() {
+    this.#filterItemTripEventPresenters.forEach((element) => {
+      element.desroy();
+    });
   }
 
 }

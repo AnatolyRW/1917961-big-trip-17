@@ -1,7 +1,8 @@
 import { TRIP_EVENT_TYPES, DESCRIPTION_CITYS, NAME_CITYS, MAX_COUNT_LINE_DESCRIPTION_CITY, MAX_COUNT_PICTURE, MAX_PRICE } from './const.js';
 import { getRandomInteger, deleteRandomValueFromArray } from '../util.js';
+import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
-import utc  from 'dayjs/plugin/utc.js';
+import utc from 'dayjs/plugin/utc.js';
 dayjs.extend(utc);
 
 
@@ -52,10 +53,8 @@ const generateDateFrom = () => {
 
 const generateDateTo = (date) => {
   const MINUTES_IN_DAYS = 3 * 1440;
-  return dayjs(date).add(getRandomInteger(0,MINUTES_IN_DAYS), 'minute');
+  return dayjs(date).add(getRandomInteger(0, MINUTES_IN_DAYS), 'minute');
 };
-
-let newId = 0;
 
 const generateTripEvent = (offers) => function () {
   const date = generateDateFrom();
@@ -64,8 +63,8 @@ const generateTripEvent = (offers) => function () {
     dateFrom: date,
     dateTo: generateDateTo(date),
     destination: generateDestination(),
-    id: ++newId,
-    isFavorite: getRandomInteger(0,1),
+    id: nanoid(),
+    isFavorite: getRandomInteger(0, 1),
     offers: generateOffer(offers),
     type: randomTripEventType
   };
