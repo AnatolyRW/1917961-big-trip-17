@@ -1,4 +1,3 @@
-import FilterType from './const.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
 dayjs.extend(duration);
@@ -33,10 +32,24 @@ const getDurationDates = (dateFrom, dateTo) => {
 
 };
 
+const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1),
+  ];
+};
+
 /*const filter = {
   [FilterType.ALL]: (tasks) => tasks.filter((task) => !task.isArchive),
   [FilterType.OVERDUE]: (tasks) => tasks.filter((task) => isTaskExpired(task.dueDate) && !task.isArchive),
   [FilterType.EVERYTHING]: this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo)
 };*/
 
-export { getRandomInteger, deleteRandomValueFromArray, checkLengthString, getDurationDates };
+export { getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray, updateItem };

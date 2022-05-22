@@ -1,4 +1,5 @@
 import { render } from '../framework/render.js';
+import { updateItem } from '../util/common.js';
 
 import FilterPresenter from './filter-presenter.js';
 import ItemTripEventPresenter from './item-trip-event-presenter.js';
@@ -30,11 +31,13 @@ export default class MainPresenter {
   }
 
   init() {
-    this.#renderSortTripEvents();
-    this.#renderlistTripEvents();
-    this.renderTripEventItems();
-    this.#filterTripEventsPresenter.init();
+    this.renderMain();
   }
+
+  #handleTaskChange = (updatedItemTripEventModel) => {
+    this.#itemsTripEventsModel = updateItem(this.#itemsTripEventsModel, updatedItemTripEventModel);
+    this.#itemTripEventPresenters.get(updatedItemTripEventModel.id).init(updatedItemTripEventModel);
+  };
 
   #renderSortTripEvents () {
     render(this.#sortTripEventsView , this.#sortTripEventsView.container);
@@ -50,11 +53,19 @@ export default class MainPresenter {
     this.#itemTripEventPresenters.set(itemTripEventModel.id, itemTripEventPresenter);
   };
 
-  renderTripEventItems() {
+  renderMain() {
     if (!this.#itemsTripEventsModel.length) {
       render(this.#noTripEventsView, this.#noTripEventsView.container);
       return;
     }
+    this.#renderSortTripEvents();
+    this.#renderlistTripEvents();
     this.#itemsTripEventsModel.forEach(this.#renderTripEventItem);
+    this.#filterTripEventsPresenter.init();
+  }
+
+  #clearListTripEventItems() {
+    this.#itemTripEventPresenters.forEach((presenter) => presenter.desroy());
+    this.#itemTripEventPresenters.clear();
   }
 }

@@ -1,4 +1,4 @@
-import { getDurationDates } from '../util.js';
+import { getDurationDates } from '../util/common.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 

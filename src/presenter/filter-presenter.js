@@ -32,7 +32,7 @@ export default class FilterPresenter {
 
   #renderFilterChange = () => {
     render(this.#filterTripEventsView, this.#filterTripEventsView.container);
-    this.#removTripEventItems();
+    this.#clearListTripEventItems();
     switch (this.#filterTripEventsView.idFilter) {
       case 'filter-future':
         this.#filterItemTripEventPresenters = this.#itemTripEventPresenters.filter(this.#applayFilterFuture);
@@ -69,10 +69,8 @@ export default class FilterPresenter {
     }
   }
 
-  #removTripEventItems() {
-    this.#filterItemTripEventPresenters.forEach((element) => {
-      element.desroy();
-    });
+  #clearListTripEventItems() {
+    this.#filterItemTripEventPresenters.forEach((presenter) => presenter.desroy());
   }
 
 }

@@ -1,5 +1,5 @@
 import { TRIP_EVENT_TYPES, DESCRIPTION_CITYS, NAME_CITYS, MAX_COUNT_LINE_DESCRIPTION_CITY, MAX_COUNT_PICTURE, MAX_PRICE } from './const.js';
-import { getRandomInteger, deleteRandomValueFromArray } from '../util.js';
+import { getRandomInteger, deleteRandomValueFromArray } from '../util/common.js';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';

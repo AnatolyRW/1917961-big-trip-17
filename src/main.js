@@ -10,6 +10,3 @@ const itemsTripEventsModel = new ItemsTripEventsModel(tripEventTypesOffersModel)
 const mainPresenter = new MainPresenter(itemsTripEventsModel, tripEventTypesOffersModel);
 mainPresenter.init();
 
-//const filterPresenter = new FilterPresenter(itemsTripEventsModel, tripEventTypesOffersModel);
-
-//filterPresenter.init();
