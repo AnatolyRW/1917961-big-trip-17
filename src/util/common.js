@@ -32,7 +32,7 @@ const getDurationDates = (dateFrom, dateTo) => {
 
 };
 
-const updateItem = (items, update) => {
+const updateItemTripEventModel = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
 
   if (index === -1) {
@@ -52,4 +52,4 @@ const updateItem = (items, update) => {
   [FilterType.EVERYTHING]: this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo)
 };*/
 
-export { getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray, updateItem };
+export { getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray, updateItemTripEventModel };

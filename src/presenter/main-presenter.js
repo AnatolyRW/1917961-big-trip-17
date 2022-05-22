@@ -1,5 +1,5 @@
 import { render } from '../framework/render.js';
-import { updateItem } from '../util/common.js';
+import { updateItemTripEventModel } from '../util/common.js';
 
 import FilterPresenter from './filter-presenter.js';
 import ItemTripEventPresenter from './item-trip-event-presenter.js';
@@ -16,13 +16,13 @@ export default class MainPresenter {
   #filterTripEventsPresenter = null;
   #itemTripEventPresenters = new Map();
 
-  #itemsTripEventsModel = null;
+  #itemsTripEventModel = null;
   #offersModel = null;
 
 
   constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
     if (itemsTripEventsModel) {
-      this.#itemsTripEventsModel = [...itemsTripEventsModel.tripEvents];
+      this.#itemsTripEventModel = [...itemsTripEventsModel.tripEvents];
     }
     if (TripEventTypesOffersModel) {
       this.#offersModel = [...TripEventTypesOffersModel.offers];
@@ -34,8 +34,8 @@ export default class MainPresenter {
     this.renderMain();
   }
 
-  #handleTaskChange = (updatedItemTripEventModel) => {
-    this.#itemsTripEventsModel = updateItem(this.#itemsTripEventsModel, updatedItemTripEventModel);
+  #handleItemTripEventChange = (updatedItemTripEventModel) => {
+    this.#itemsTripEventModel = updateItemTripEventModel(this.#itemsTripEventModel, updatedItemTripEventModel);
     this.#itemTripEventPresenters.get(updatedItemTripEventModel.id).init(updatedItemTripEventModel);
   };
 
@@ -48,19 +48,19 @@ export default class MainPresenter {
   }
 
   #renderTripEventItem = (itemTripEventModel) => {
-    const itemTripEventPresenter = new ItemTripEventPresenter(this.#listTripEventsView, this.#offersModel);
+    const itemTripEventPresenter = new ItemTripEventPresenter(this.#listTripEventsView, this.#offersModel, this.#handleItemTripEventChange);
     itemTripEventPresenter.init(itemTripEventModel);
     this.#itemTripEventPresenters.set(itemTripEventModel.id, itemTripEventPresenter);
   };
 
   renderMain() {
-    if (!this.#itemsTripEventsModel.length) {
+    if (!this.#itemsTripEventModel.length) {
       render(this.#noTripEventsView, this.#noTripEventsView.container);
       return;
     }
     this.#renderSortTripEvents();
     this.#renderlistTripEvents();
-    this.#itemsTripEventsModel.forEach(this.#renderTripEventItem);
+    this.#itemsTripEventModel.forEach(this.#renderTripEventItem);
     this.#filterTripEventsPresenter.init();
   }
 

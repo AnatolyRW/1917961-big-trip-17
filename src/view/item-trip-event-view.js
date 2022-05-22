@@ -64,9 +64,19 @@ export default class ItemTripEventView extends AbstractView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rolloutEditClickHandler);
   };
 
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+  };
+
   #rolloutEditClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
   };
 
   get containerOffersElement() {

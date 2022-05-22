@@ -152,7 +152,7 @@ export default class TripEventEditView extends AbstractView {
 
   #submitEditHandler =(evt) => {
     evt.preventDefault();
-    this._callback.rollupEditClick();
+    this._callback.submitEdit(this.#tripEvent);
   };
 
   get containerOffersElement() {
