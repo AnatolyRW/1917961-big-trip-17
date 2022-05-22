@@ -1,7 +1,6 @@
-const FilterType = {
-  FUTURE: 'future',
-  PAST: 'past',
-  EVERYTHING: 'everything'
+const MODE = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
 };
 
-export { FilterType};
+export { MODE };

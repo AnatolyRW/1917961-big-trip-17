@@ -1,3 +1,4 @@
+import { MODE } from '../const.js';
 import { remove, render, replace } from '../framework/render.js';
 import ItemTripEventView from '../view/item-trip-event-view.js';
 import EditTripEvenView from '../view/edit-trip-event-view.js';
@@ -12,12 +13,16 @@ export default class ItemTripEventPresenter {
 
   #tripEventModel = null;
   #offersModel = null;
-  #changeTripEventModel = null;
+  #tripEventMode = MODE.DEFAULT;
 
-  constructor(listTripEventContainer, TripEventTypesOffersModel, changeTripEventModel) {
+  #changeTripEventModel = null;
+  #changeTripEventMode = null;
+
+  constructor(listTripEventContainer, TripEventTypesOffersModel, changeTripEventModel, changeTripEventMode) {
     this.#listTripEventContainer = listTripEventContainer;
     this.#offersModel = TripEventTypesOffersModel;
     this.#changeTripEventModel = changeTripEventModel;
+    this.#changeTripEventMode = changeTripEventMode;
   }
 
   get tripEventModel() {
@@ -57,11 +62,11 @@ export default class ItemTripEventPresenter {
       return;
     }
 
-    if (this.#listTripEventContainer.element.contains(prevItemTripEventView.element)) {
+    if (this.#tripEventMode === MODE.DEFAULT) {
       replace(this.#itemTripEventView, prevItemTripEventView);
     }
 
-    if (this.#listTripEventContainer.element.contains(prevEditTripEvenView.element)) {
+    if (this.#tripEventMode === MODE.EDITING) {
       replace(this.#editTripEvenView, prevEditTripEvenView);
     }
 
@@ -80,10 +85,13 @@ export default class ItemTripEventPresenter {
 
   #replaceItemToEdit = () => {
     replace(this.#editTripEvenView, this.#itemTripEventView);
+    this.#changeTripEventMode();
+    this.#tripEventMode = MODE.EDITING;
   };
 
   #replaceEditToItem = () => {
     replace(this.#itemTripEventView, this.#editTripEvenView);
+    this.#tripEventMode = MODE.DEFAULT;
   };
 
   #handleFavoriteClick = () => {
@@ -125,6 +133,12 @@ export default class ItemTripEventPresenter {
     const offersEditTripEventPresenter = new OffersEditTripEventPresenter(this.#editTripEvenView, this.#tripEventModel);
     offersEditTripEventPresenter.init(this.#offersModel);
   }
+
+  resetView = () => {
+    if (this.#tripEventMode !== MODE.DEFAULT) {
+      this.#replaceEditToItem();
+    }
+  };
 
   desroy() {
     remove(this.#itemTripEventView);

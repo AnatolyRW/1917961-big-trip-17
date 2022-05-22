@@ -46,10 +46,4 @@ const updateItemTripEventModel = (items, update) => {
   ];
 };
 
-/*const filter = {
-  [FilterType.ALL]: (tasks) => tasks.filter((task) => !task.isArchive),
-  [FilterType.OVERDUE]: (tasks) => tasks.filter((task) => isTaskExpired(task.dueDate) && !task.isArchive),
-  [FilterType.EVERYTHING]: this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo)
-};*/
-
 export { getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray, updateItemTripEventModel };
