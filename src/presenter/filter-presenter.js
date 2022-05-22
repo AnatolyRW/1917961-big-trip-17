@@ -1,62 +1,76 @@
 import FilterTripEventsView from '../view/filter-trip-events-view';
-import ItemTripEventPresenter from './item-trip-event-presenter.js';
 import { render } from '../framework/render.js';
 import dayjs from 'dayjs';
-import utc  from 'dayjs/plugin/utc.js';
+import utc from 'dayjs/plugin/utc.js';
 dayjs.extend(utc);
 
 export default class FilterPresenter {
 
-  #filterTripEvents = null;
-  #itemsTripEventsModel = null;
-  #offersModel = null;
-  #itemTripEventPresenter = null;
+  #filterTripEventsView = new FilterTripEventsView();
+  #noTripEventsView = null;
 
-  constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
-    this.#filterTripEvents = new FilterTripEventsView();
-    if (itemsTripEventsModel) {
-      this.#itemsTripEventsModel = [...itemsTripEventsModel.tripEvents];
-    }
+  #itemTripEventPresenters = [];
+  #filterItemTripEventPresenters = [];
 
-    if (TripEventTypesOffersModel) {
-      this.#offersModel = [...TripEventTypesOffersModel.offers];
-    }
+  constructor(itemTripEventPresenters, noTripEventsView) {
+    this.#itemTripEventPresenters = itemTripEventPresenters;
+    this.#noTripEventsView = noTripEventsView;
   }
 
-  init () {
+  get filterTripEventsView() {
+    return this.#filterTripEventsView;
+  }
+
+  init() {
+    this.#filterItemTripEventPresenters = this.#itemTripEventPresenters;
     this.#renderFilterTripEvents();
-    this.#itemTripEventPresenter = new ItemTripEventPresenter(this.#itemsTripEventsModel, this.#offersModel);
-    this.#itemTripEventPresenter.init();
   }
 
-  #renderFilterTripEvents () {
+  #applayFilterFuture = (itemTripEventPresenter) => dayjs().isBefore(itemTripEventPresenter.tripEventModel.dateTo);
 
-    render(this.#filterTripEvents, this.#filterTripEvents.container);
+  #applayFilterPast = (itemTripEventPresenter) => dayjs().isAfter(itemTripEventPresenter.tripEventModel.dateFrom);
 
-    const renderFilterChange = () => {
-      render(this.#filterTripEvents, this.#filterTripEvents.container);
-      switch(this.#filterTripEvents.idFilter) {
-        case 'filter-future':
-          this.#itemTripEventPresenter.itemsTripEventsModel = this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo));
-          this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init();
-          break;
-        case 'filter-past':
-          this.#itemTripEventPresenter.itemsTripEventsModel = this.#itemsTripEventsModel.filter((itemTripEventModel) => dayjs().isAfter(itemTripEventModel.dateFrom));
-          this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init();
-          break;
-        default:
-          this.#itemTripEventPresenter.itemsTripEventsModel = this.#itemsTripEventsModel;
-          this.#itemTripEventPresenter.removeItemTripEvent();
-          this.#itemTripEventPresenter.init();
-      }
-    };
+  #renderFilterChange = () => {
+    render(this.#filterTripEventsView, this.#filterTripEventsView.container);
+    this.#clearListTripEventItems();
+    switch (this.#filterTripEventsView.idFilter) {
+      case 'filter-future':
+        this.#filterItemTripEventPresenters = this.#itemTripEventPresenters.filter(this.#applayFilterFuture);
+        break;
+      case 'filter-past':
+        this.#filterItemTripEventPresenters = this.#itemTripEventPresenters.filter(this.#applayFilterPast);
+        break;
+      case 'filter-everything':
+        this.#filterItemTripEventPresenters = this.#itemTripEventPresenters;
+        break;
+      default:
+        this.#filterItemTripEventPresenters = this.#itemTripEventPresenters;
+    }
+    this.#renderTripEventItems(this.#filterTripEventsView.idFilter);
+  };
 
-    this.#filterTripEvents.setFilterChangeHandler(() => {
-      renderFilterChange();
-    });
+  #handleFilterChange = () => {
+    this.#renderFilterChange();
+  };
 
+  #renderFilterTripEvents() {
+    render(this.#filterTripEventsView, this.#filterTripEventsView.container);
+    this.#filterTripEventsView.setFilterChangeHandler(this.#handleFilterChange);
+  }
+
+  #renderTripEventItems(idFilter) {
+    if (this.#filterItemTripEventPresenters.length) {
+      this.#filterItemTripEventPresenters.forEach((element) => {
+        element.renderItemTripEvent();
+      });
+    } else {
+      this.#noTripEventsView.idFilter = idFilter;
+      render(this.#noTripEventsView, this.#noTripEventsView.container);
+    }
+  }
+
+  #clearListTripEventItems() {
+    this.#filterItemTripEventPresenters.forEach((presenter) => presenter.desroy());
   }
 
 }

@@ -1,5 +1,5 @@
 import { TRIP_EVENT_TYPES, TITLE_OFFER, MAX_PRICE } from './const.js';
-import { getRandomInteger } from '../util';
+import { getRandomInteger } from '../util/common';
 
 const generateOffer = (id) => (
   {

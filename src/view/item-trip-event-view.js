@@ -1,9 +1,9 @@
-import { getDurationDates } from '../util.js';
+import { getDurationDates } from '../util/common.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 
 const createItemTrioEventTemplate = (tripEvent) => {
-  const {basePrice,
+  const { basePrice,
     dateFrom,
     dateTo,
     destination,
@@ -64,14 +64,23 @@ export default class ItemTripEventView extends AbstractView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rolloutEditClickHandler);
   };
 
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+  };
+
   #rolloutEditClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
   };
 
-  static get Container () {
-    const siteMainElement = document.querySelector('.page-body__page-main');
-    return siteMainElement.querySelector('.trip-events');
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  };
+
+  get containerOffersElement() {
+    return this.element.querySelector('.event__selected-offers');
   }
 
 }
