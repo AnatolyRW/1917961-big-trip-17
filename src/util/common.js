@@ -46,4 +46,8 @@ const updateItemTripEventModel = (items, update) => {
   ];
 };
 
-export { getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray, updateItemTripEventModel };
+const applayFilterFuture = (itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo);
+
+const applayFilterPast = (itemTripEventModel) => dayjs().isAfter(itemTripEventModel.dateFrom);
+
+export { getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray, updateItemTripEventModel, applayFilterFuture, applayFilterPast };

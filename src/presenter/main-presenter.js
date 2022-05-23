@@ -1,5 +1,6 @@
-import { render } from '../framework/render.js';
-import { updateItemTripEventModel } from '../util/common.js';
+import { FILTER } from '../const.js';
+import { remove, render } from '../framework/render.js';
+import { updateItemTripEventModel, applayFilterFuture, applayFilterPast } from '../util/common.js';
 
 import FilterPresenter from './filter-presenter.js';
 import ItemTripEventPresenter from './item-trip-event-presenter.js';
@@ -11,23 +12,25 @@ import NoTripEventsView from '../view/no-trip-events-view.js';
 export default class MainPresenter {
   #listTripEventsView = new ListTripEventsView();
   #sortTripEventsView = new SortTripEventsView();
-  #noTripEventsView = new NoTripEventsView();
+  #noTripEventsView = new NoTripEventsView(FILTER.EVERYTHING);
 
   #filterTripEventsPresenter = null;
   #itemsTripEventPresenter = new Map();
 
   #itemsTripEventModel = null;
+  #itemsTripEventSourceModel = null;
   #offersModel = null;
 
 
   constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
     if (itemsTripEventsModel) {
       this.#itemsTripEventModel = [...itemsTripEventsModel.tripEvents];
+      this.#itemsTripEventSourceModel = [...itemsTripEventsModel.tripEvents];
     }
     if (TripEventTypesOffersModel) {
       this.#offersModel = [...TripEventTypesOffersModel.offers];
     }
-    this.#filterTripEventsPresenter = new FilterPresenter(this.#itemsTripEventPresenter, this.#noTripEventsView);
+    this.#filterTripEventsPresenter = new FilterPresenter(this.#handleFilterChange);
   }
 
   init() {
@@ -35,24 +38,53 @@ export default class MainPresenter {
   }
 
   #handleItemTripEventChange = (updatedItemTripEventModel) => {
-    this.#itemsTripEventModel = updateItemTripEventModel(this.#itemsTripEventModel, updatedItemTripEventModel);
+    this.#itemsTripEventSourceModel = updateItemTripEventModel(this.#itemsTripEventModel, updatedItemTripEventModel);
     this.#itemsTripEventPresenter.get(updatedItemTripEventModel.id).init(updatedItemTripEventModel);
   };
 
-  #handleItemTrimEventModeChange = () => {
+  #handleItemTripEventModeChange = () => {
     this.#itemsTripEventPresenter.forEach((presenter) => presenter.resetView());
   };
 
-  #renderSortTripEvents () {
-    render(this.#sortTripEventsView , this.#sortTripEventsView.container);
+  #filterChange = (idFilter) => {
+    this.#clearListTripEventItems();
+    switch (idFilter) {
+      case FILTER.FUTURE:
+        this.#itemsTripEventModel = this.#itemsTripEventSourceModel.filter(applayFilterFuture);
+        break;
+      case FILTER.PAST:
+        this.#itemsTripEventModel = this.#itemsTripEventSourceModel.filter(applayFilterPast);
+        break;
+      case FILTER.EVERYTHING:
+        this.#itemsTripEventModel = this.#itemsTripEventSourceModel;
+        break;
+      default:
+        this.#itemsTripEventModel = this.#itemsTripEventSourceModel;
+    }
+  };
+
+  #handleFilterChange = (idFilter) => {
+    this.#filterChange(idFilter);
+    if (!this.#itemsTripEventModel.length) {
+      this.#noTripEventsView.idFilter = idFilter;
+      render(this.#noTripEventsView, this.#noTripEventsView.container);
+      return;
+    }
+    this.#renderlistTripEventItems();
+  };
+
+  #renderSortTripEvents() {
+    render(this.#sortTripEventsView, this.#sortTripEventsView.container);
   }
 
-  #renderlistTripEvents () {
+  #renderlistTripEventItems() {
+    remove(this.#noTripEventsView);
     render(this.#listTripEventsView, this.#listTripEventsView.container);
+    this.#itemsTripEventModel.forEach(this.#renderTripEventItem);
   }
 
   #renderTripEventItem = (itemTripEventModel) => {
-    const itemTripEventPresenter = new ItemTripEventPresenter(this.#listTripEventsView, this.#offersModel, this.#handleItemTripEventChange, this.#handleItemTrimEventModeChange);
+    const itemTripEventPresenter = new ItemTripEventPresenter(this.#listTripEventsView, this.#offersModel, this.#handleItemTripEventChange, this.#handleItemTripEventModeChange);
     itemTripEventPresenter.init(itemTripEventModel);
     this.#itemsTripEventPresenter.set(itemTripEventModel.id, itemTripEventPresenter);
   };
@@ -63,8 +95,7 @@ export default class MainPresenter {
       return;
     }
     this.#renderSortTripEvents();
-    this.#renderlistTripEvents();
-    this.#itemsTripEventModel.forEach(this.#renderTripEventItem);
+    this.#renderlistTripEventItems();
     this.#filterTripEventsPresenter.init();
   }
 

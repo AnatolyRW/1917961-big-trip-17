@@ -25,9 +25,9 @@ export default class FilterTripEventsView extends AbstractView {
 
   #idFilter = null;
 
-  constructor () {
+  constructor (idFilter) {
     super();
-    this.#idFilter = 'filter-everything';
+    this.#idFilter = idFilter;
   }
 
   get template() {
@@ -44,9 +44,12 @@ export default class FilterTripEventsView extends AbstractView {
   };
 
   #filterChangeHandler = (evt) => {
+    if (evt.target.tagName !== 'INPUT') {
+      return;
+    }
     this.#idFilter = evt.target.id;
     evt.preventDefault();
-    this._callback.change();
+    this._callback.change(this.#idFilter);
   };
 
   get container () {
