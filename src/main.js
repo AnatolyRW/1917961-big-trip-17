@@ -1,6 +1,5 @@
 import './presenter/item-trip-event-presenter.js';
 
-//import FilterPresenter from './presenter/filter-presenter.js';
 import MainPresenter from './presenter/main-presenter.js';
 import ItemsTripEventsModel from './model/items-trip-events-model.js';
 import TripEventTypesOffersModel from './model/trip-event-types-offers-model.js';

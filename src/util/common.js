@@ -46,4 +46,17 @@ const updateItemTripEventModel = (items, update) => {
   ];
 };
 
-export { getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray, updateItemTripEventModel };
+const applayFilterFuture = (itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo);
+
+const applayFilterPast = (itemTripEventModel) => dayjs().isAfter(itemTripEventModel.dateFrom);
+
+const sortPrice = (a, b) => b.basePrice - a.basePrice;
+
+const sortTime = (a, b) => dayjs(b.dateTo).diff(b.dateFrom) - dayjs(a.dateTo).diff(a.dateFrom);
+
+const sortDay = (a, b) => dayjs(b.dateFrom).diff(a.dateFrom);
+
+export {
+  getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray,
+  updateItemTripEventModel, applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay
+};

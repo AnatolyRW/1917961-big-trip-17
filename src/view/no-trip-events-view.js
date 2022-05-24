@@ -19,9 +19,9 @@ export default class NoTripEventsView extends AbstractView{
 
   #idFilter = null;
 
-  constructor () {
+  constructor (idFilter) {
     super();
-    this.#idFilter = 'filter-everything';
+    this.#idFilter = idFilter;
   }
 
   get idFilter () {
