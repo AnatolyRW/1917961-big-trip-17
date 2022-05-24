@@ -9,4 +9,10 @@ const FILTER = {
   PAST: 'filter-past'
 };
 
-export { MODE, FILTER };
+const SORT_TYPE = {
+  DAY: 'sort-day',
+  TIME: 'sort-time',
+  PRICE: 'sort-price'
+};
+
+export { MODE, FILTER, SORT_TYPE };
