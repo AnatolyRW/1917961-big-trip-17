@@ -1,5 +1,5 @@
 import { MODE } from '../const.js';
-import { remove, replace } from '../framework/render.js';
+import { remove } from '../framework/render.js';
 import EditTripEventView from '../view/edit-trip-event-view.js';
 import OffersEditTripEventPresenter from './offers-edit-trip-event-presenter';
 
@@ -14,15 +14,15 @@ export default class EditTripEventPresenter {
   #tripEventMode = MODE.DEFAULT;
   #distinationModel = null;
 
-  #changeTripEventModel = null;
   #changeTripEventMode = null;
+  #destroyEditTripEventPresenter = null;
 
-  constructor(listTripEventContainer, tripEventTypesOffersModel, destinationModel, changeTripEventModel, changeTripEventMode) {
+  constructor(listTripEventContainer, tripEventTypesOffersModel, destinationModel, itemTripEventView, destroyEditTripEventPresenter) {
     this.#listTripEventContainer = listTripEventContainer;
     this.#offersModel = tripEventTypesOffersModel;
-    this.#changeTripEventModel = changeTripEventModel;
-    this.#changeTripEventMode = changeTripEventMode;
     this.#distinationModel = destinationModel;
+    this.#itemTripEventView = itemTripEventView;
+    this.#destroyEditTripEventPresenter = destroyEditTripEventPresenter;
   }
 
   get tripEventModel() {
@@ -60,22 +60,23 @@ export default class EditTripEventPresenter {
 
   }
 
-  #onEscKeyDown = (evt) => {
+  onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#replaceEditToItem();
-      document.removeEventListener('keydown', this.#onEscKeyDown);
+      this.#destroyEditTripEventPresenter();
+      document.removeEventListener('keydown', this.onEscKeyDown);
     }
   };
 
-  #replaceEditToItem = () => {
-    replace(this.#itemTripEventView, this.#editTripEventView);
-    //this.#tripEventMode = MODE.DEFAULT;
+  #handleRollupEditClick = () => {
+    this.#destroyEditTripEventPresenter();
+    document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
-  #handleRollupEditClick = () => {
-    this.#replaceEditToItem();
-    document.removeEventListener('keydown', this.#onEscKeyDown);
+  #handleSubmitEdit = () => {
+    this.replaceEditToItem();
+    this.#destroyEditTripEventPresenter();
+    document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
   #renderOffersEditTripEvent() {
@@ -83,13 +84,8 @@ export default class EditTripEventPresenter {
     offersEditTripEventPresenter.init(this.#offersModel);
   }
 
-  #handleSubmitEdit = (tripEventModel) => {
-    this.#changeTripEventModel(tripEventModel);
-    this.#replaceEditToItem();
-    document.removeEventListener('keydown', this.#onEscKeyDown);
-  };
-
-  removeItemTripEvent() {
+  desroy() {
     remove(this.#editTripEventView);
   }
+
 }

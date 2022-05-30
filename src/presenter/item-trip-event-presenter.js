@@ -1,6 +1,7 @@
 import { MODE } from '../const.js';
 import { remove, render, replace } from '../framework/render.js';
 import ItemTripEventView from '../view/item-trip-event-view.js';
+import EditTripEventPresenter from './edit-trip-event-presenter.js';
 import OffersItemTripEventPresenter from './offers-item-trip-event-presenter.js';
 
 export default class ItemTripEventPresenter {
@@ -17,12 +18,15 @@ export default class ItemTripEventPresenter {
   #changeTripEventModel = null;
   #changeTripEventMode = null;
 
-  constructor(listTripEventContainer, tripEventTypesOffersModel, destinationModel, changeTripEventModel, changeTripEventMode) {
+  #editTripEventPresenter = null;
+
+
+  constructor(listTripEventContainer, tripEventTypesOffersModel, distinationModel, changeTripEventModel, changeTripEventMode) {
     this.#listTripEventContainer = listTripEventContainer;
     this.#offersModel = tripEventTypesOffersModel;
     this.#changeTripEventModel = changeTripEventModel;
     this.#changeTripEventMode = changeTripEventMode;
-    this.#distinationModel = destinationModel;
+    this.#distinationModel = distinationModel;
   }
 
   get tripEventModel() {
@@ -53,7 +57,7 @@ export default class ItemTripEventPresenter {
     this.#tripEventModel = tripEventsModel;
 
     const prevItemTripEventView = this.#itemTripEventView;
-    const prevEditTripEvenView = this.editTripEvenView;
+    const prevEditTripEvenView = this.#editTripEvenView;
 
     this.#itemTripEventView = new ItemTripEventView(tripEventsModel);
     this.#renderOffersItemTripEvent();
@@ -79,23 +83,22 @@ export default class ItemTripEventPresenter {
 
   }
 
-  /*#onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this.#replaceEditToItem();
-      document.removeEventListener('keydown', this.#onEscKeyDown);
-    }
-  };*/
-
   #replaceItemToEdit = () => {
-    replace(this.#editTripEvenView, this.#itemTripEventView);
+    this.#editTripEventPresenter = new EditTripEventPresenter(
+      this.#listTripEventContainer,
+      this.#offersModel,
+      this.#distinationModel,
+      this.#itemTripEventView,
+      this.#destroyEditTripEventPresenter
+    );
+    this.#editTripEventPresenter.init(this.#tripEventModel);
+    replace(this.#editTripEventPresenter.editTripEvenView, this.#itemTripEventView);
     this.#changeTripEventMode();
     this.#tripEventMode = MODE.EDITING;
   };
 
   #replaceEditToItem = () => {
-    replace(this.#itemTripEventView, this.#editTripEvenView);
-    this.#tripEventMode = MODE.DEFAULT;
+    replace(this.#itemTripEventView, this.#editTripEventPresenter.editTripEvenView);
   };
 
   #handleFavoriteClick = () => {
@@ -104,7 +107,7 @@ export default class ItemTripEventPresenter {
 
   #handleRolloutEditClick = () => {
     this.#replaceItemToEdit();
-    //document.addEventListener('keydown', this.#onEscKeyDown);
+    document.addEventListener('keydown', this.#editTripEventPresenter.onEscKeyDown);
   };
 
   #renderOffersItemTripEvent() {
@@ -114,12 +117,19 @@ export default class ItemTripEventPresenter {
 
   resetView = () => {
     if (this.#tripEventMode !== MODE.DEFAULT) {
-      this.#replaceEditToItem();
+      this.#destroyEditTripEventPresenter();
     }
   };
 
   desroy() {
     remove(this.#itemTripEventView);
-    remove(this.#editTripEvenView);
   }
+
+  #destroyEditTripEventPresenter = () => {
+    this.#replaceEditToItem();
+    this.#tripEventMode = MODE.DEFAULT;
+    this.#editTripEventPresenter.desroy();
+    this.#editTripEventPresenter = null;
+  };
+
 }
