@@ -23,7 +23,7 @@ const TITLE_OFFER = [
   'Shower'
 ];
 
-const NAME_CITYS = ['London, England', 'Paris, France', 'New York City, United States', 'Moscow, Russia', 'Dubai, United Arab Emirates', 'Tokyo, Japan', 'Barcelona, Spain'];
+const NAME_CITYS = ['London', 'Paris', 'New York City', 'Moscow', 'Dubai', 'Tokyo', 'Barcelona'];
 const MAX_COUNT_LINE_DESCRIPTION_CITY = 5;
 const MAX_COUNT_PICTURE = 5;
 const MAX_PRICE = 1000;

@@ -1,6 +1,14 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-const createEditTripEventTemplate = (tripEvent) => {
+const createDestinationList = (distinationModel) => {
+  let destinationList = '';
+  distinationModel.forEach((element) => {
+    destinationList += `<option value="${element.name}"></option>`;
+  });
+  return destinationList;
+};
+
+const createEditTripEventTemplate = (tripEvent, distinationModel) => {
   const {basePrice,
     dateFrom,
     dateTo,
@@ -76,9 +84,7 @@ const createEditTripEventTemplate = (tripEvent) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
+            ${createDestinationList(distinationModel)}
           </datalist>
         </div>
 
@@ -122,17 +128,19 @@ const createEditTripEventTemplate = (tripEvent) => {
 `);
 };
 
-export default class TripEventEditView extends AbstractView {
+export default class TripEventEditView extends AbstractStatefulView {
 
-  #tripEvent = null;
+  #distinationModel = null;
 
-  constructor(tripEvent) {
+  constructor(tripEvent, distinationModel) {
     super();
-    this.#tripEvent = tripEvent;
+    this._state = TripEventEditView.parseTripEventToState(tripEvent);
+    this.#distinationModel = distinationModel;
+    this.element.querySelector('.event__type-list').addEventListener('change', this.#changeTypeTripEvent);
   }
 
   get template() {
-    return createEditTripEventTemplate(this.#tripEvent);
+    return createEditTripEventTemplate(this._state, this.#distinationModel);
   }
 
   setRollupEditClickHandler = (callback) => {
@@ -152,11 +160,22 @@ export default class TripEventEditView extends AbstractView {
 
   #submitEditHandler =(evt) => {
     evt.preventDefault();
-    this._callback.submitEdit(this.#tripEvent);
+    this._callback.submitEdit(this._state);
+  };
+
+  #changeTypeTripEvent = (evt) => {
+    evt.preventDefault();
+    //console.log(evt.target);
   };
 
   get containerOffersElement() {
     return this.element.querySelector('.event__available-offers');
   }
 
+  static parseTripEventToState = (tripEvent) => ({...tripEvent});
+
+  static parseStateToTripEvent = (state) => {
+    const tripEvent = {...state};
+    return tripEvent;
+  };
 }
