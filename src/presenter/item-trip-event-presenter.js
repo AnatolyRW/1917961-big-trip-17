@@ -24,9 +24,9 @@ export default class ItemTripEventPresenter {
   constructor(listTripEventContainer, tripEventTypesOffersModel, distinationModel, changeTripEventModel, changeTripEventMode) {
     this.#listTripEventContainer = listTripEventContainer;
     this.#offersModel = tripEventTypesOffersModel;
+    this.#distinationModel = distinationModel;
     this.#changeTripEventModel = changeTripEventModel;
     this.#changeTripEventMode = changeTripEventMode;
-    this.#distinationModel = distinationModel;
   }
 
   get tripEventModel() {

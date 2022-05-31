@@ -1,4 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import { TRIP_EVENT_TYPES } from '../mock/const.js';
 
 const createDestinationList = (distinationModel) => {
   let destinationList = '';
@@ -8,8 +9,19 @@ const createDestinationList = (distinationModel) => {
   return destinationList;
 };
 
+const createTypeItemTripEvent = (tripEventTypes, type) => {
+  let listTypeTripEvent = '';
+  tripEventTypes.forEach((tripEventType) => {
+    listTypeTripEvent += `<div class="event__type-item">
+    <input id="event-type-${tripEventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${type === tripEventType ? 'checked' : ''}>
+    <label class="event__type-label  event__type-label--${tripEventType}" for="event-type-${tripEventType}-1">${tripEventType}</label>
+  </div>`;
+  });
+  return listTypeTripEvent;
+};
+
 const createEditTripEventTemplate = (tripEvent, distinationModel) => {
-  const {basePrice,
+  const { basePrice,
     dateFrom,
     dateTo,
     destination,
@@ -30,50 +42,8 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Event type</legend>
 
-              <div class="event__type-item">
-                <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${type === 'taxi' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-              </div>
+              ${createTypeItemTripEvent(TRIP_EVENT_TYPES, type)}
 
-              <div class="event__type-item">
-                <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" ${type === 'bus' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train" ${type === 'train' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship" ${type === 'ship' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${type === 'drive' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" ${type === 'flight' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in" ${type === 'checj-in' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing" ${type === 'sightseeing' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-              </div>
-
-              <div class="event__type-item">
-                <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant" ${type === 'restaurant' ? 'checked' : ''}>
-                <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-              </div>
             </fieldset>
           </div>
         </div>
@@ -84,7 +54,9 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
           <datalist id="destination-list-1">
+
             ${createDestinationList(distinationModel)}
+
           </datalist>
         </div>
 
@@ -136,7 +108,7 @@ export default class TripEventEditView extends AbstractStatefulView {
     super();
     this._state = TripEventEditView.parseTripEventToState(tripEvent);
     this.#distinationModel = distinationModel;
-    this.element.querySelector('.event__type-list').addEventListener('change', this.#changeTypeTripEvent);
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypeTripEvent);
   }
 
   get template() {
@@ -158,24 +130,28 @@ export default class TripEventEditView extends AbstractStatefulView {
     this.element.querySelector('form').addEventListener('submit', this.#submitEditHandler);
   };
 
-  #submitEditHandler =(evt) => {
+  #submitEditHandler = (evt) => {
     evt.preventDefault();
     this._callback.submitEdit(this._state);
   };
 
   #changeTypeTripEvent = (evt) => {
     evt.preventDefault();
-    //console.log(evt.target);
+    console.log(evt.target);
+    console.log(evt.target.value);
+    this.updateElement({
+      type: evt.target.value
+    });
   };
 
   get containerOffersElement() {
     return this.element.querySelector('.event__available-offers');
   }
 
-  static parseTripEventToState = (tripEvent) => ({...tripEvent});
+  static parseTripEventToState = (tripEvent) => ({ ...tripEvent });
 
   static parseStateToTripEvent = (state) => {
-    const tripEvent = {...state};
+    const tripEvent = { ...state };
     return tripEvent;
   };
 }
