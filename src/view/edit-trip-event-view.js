@@ -12,10 +12,11 @@ const createDestinationList = (distinationModel) => {
 const createTypeItemTripEvent = (tripEventTypes, type) => {
   let listTypeTripEvent = '';
   tripEventTypes.forEach((tripEventType) => {
-    listTypeTripEvent += `<div class="event__type-item">
-    <input id="event-type-${tripEventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${type === tripEventType ? 'checked' : ''}>
-    <label class="event__type-label  event__type-label--${tripEventType}" for="event-type-${tripEventType}-1">${tripEventType}</label>
-  </div>`;
+    listTypeTripEvent +=
+    `<div class="event__type-item">
+       <input id="event-type-${tripEventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${type === tripEventType ? 'checked' : ''}>
+       <label class="event__type-label  event__type-label--${tripEventType}" for="event-type-${tripEventType}-1">${tripEventType}</label>
+     </div>`;
   });
   return listTypeTripEvent;
 };
@@ -50,7 +51,7 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            Flight
+            ${type}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
           <datalist id="destination-list-1">
@@ -108,7 +109,7 @@ export default class TripEventEditView extends AbstractStatefulView {
     super();
     this._state = TripEventEditView.parseTripEventToState(tripEvent);
     this.#distinationModel = distinationModel;
-    this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypeTripEvent);
+    this.#setInnerHandlers();
   }
 
   get template() {
@@ -135,23 +136,40 @@ export default class TripEventEditView extends AbstractStatefulView {
     this._callback.submitEdit(this._state);
   };
 
+  setRenderOffersEditTripEvent = (callback) => {
+    this._callback.renderOffers = callback;
+  };
+
   #changeTypeTripEvent = (evt) => {
     evt.preventDefault();
-    console.log(evt.target);
-    console.log(evt.target.value);
+    if (evt.target.tagName !== 'LABEL') {
+      return;
+    }
     this.updateElement({
-      type: evt.target.value
+      type: evt.target.innerText
     });
+    this._callback.renderOffers();
   };
 
   get containerOffersElement() {
     return this.element.querySelector('.event__available-offers');
   }
 
-  static parseTripEventToState = (tripEvent) => ({ ...tripEvent });
+  static parseTripEventToState = (tripEvent) => ({ ...tripEvent});
 
   static parseStateToTripEvent = (state) => {
     const tripEvent = { ...state };
     return tripEvent;
   };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypeTripEvent);
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setRollupEditClickHandler(this._callback.rollupEditClick);
+    this.setSubmitEditHandler(this._callback.submitEdit);
+  };
+
 }
