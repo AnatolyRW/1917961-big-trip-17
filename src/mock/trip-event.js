@@ -39,8 +39,8 @@ const generateTripEvent = (offers, destination) => function () {
   const date = generateDateFrom();
   return {
     basePrice: getRandomInteger(0, MAX_PRICE),
-    dateFrom: date,
-    dateTo: generateDateTo(date),
+    dateFrom: date.toISOString(),
+    dateTo: generateDateTo(date).toISOString(),
     destination: destination[getRandomInteger(0, destination.length - 1)],
     id: nanoid(),
     isFavorite: getRandomInteger(0, 1),

@@ -1,5 +1,9 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { TRIP_EVENT_TYPES } from '../mock/const.js';
+import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 const createDestinationList = (distinationModel) => {
   let destinationList = '';
@@ -63,10 +67,10 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom.format('DD/MM/YY HH:MM')}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YY HH:MM')}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo.format('DD/MM/YY HH:MM')}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YY HH:MM')}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -104,12 +108,15 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
 export default class EditTripEventView extends AbstractStatefulView {
 
   #distinationModel = null;
+  #datepicker = null;
 
   constructor(tripEvent, distinationModel) {
     super();
     this._state = EditTripEventView.parseTripEventToState(tripEvent);
     this.#distinationModel = distinationModel;
     this.#setInnerHandlers();
+    this.#setDateFromPicker();
+    this.#setDateToPicker();
   }
 
   get template() {
@@ -185,6 +192,50 @@ export default class EditTripEventView extends AbstractStatefulView {
     this.setRollupEditClickHandler(this._callback.rollupEditClick);
     this.setSubmitEditHandler(this._callback.submitEdit);
     this.setDestinationChangeHandler(this._callback.destinationChange);
+    this.#setDateFromPicker();
+    this.#setDateToPicker();
+  };
+
+  #dateFromChangeHandler = ([newDateFrom]) => {
+    this.updateElement({
+      dateFrom: newDateFrom,
+    });
+    this._callback.renderOffers(this._state);
+  };
+
+  #setDateFromPicker = () => {
+    this.#datepicker = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        // eslint-disable-next-line camelcase
+        time_24hr: true,
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dateFromChangeHandler,
+      },
+    );
+  };
+
+  #dateToChangeHandler = ([newDateTo]) => {
+    this.updateElement({
+      dateTo: newDateTo,
+    });
+    this._callback.renderOffers(this._state);
+  };
+
+  #setDateToPicker = () => {
+    this.#datepicker = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        // eslint-disable-next-line camelcase
+        time_24hr: true,
+        defaultDate: this._state.dateTo,
+        onChange: this.#dateToChangeHandler,
+      },
+    );
   };
 
 }

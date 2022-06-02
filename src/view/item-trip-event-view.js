@@ -1,5 +1,6 @@
 import { getDurationDates } from '../util/common.js';
 import AbstractView from '../framework/view/abstract-view.js';
+import dayjs from 'dayjs';
 
 
 const createItemTrioEventTemplate = (tripEvent) => {
@@ -13,18 +14,18 @@ const createItemTrioEventTemplate = (tripEvent) => {
   return (`
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${dateFrom.toDate()}">${dateFrom.format('MMM D')}</time>
+        <time class="event__date" datetime="${dayjs(dateFrom).toDate()}">${dayjs(dateFrom).format('MMM D')}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${tripEvent.type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${type} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dateFrom.toDate()}">${dateFrom.format('HH:MM')}</time>
+            <time class="event__start-time" datetime="${dayjs(dateFrom).toDate()}">${dayjs(dateFrom).format('HH:MM')}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dateTo.toDate()}">${dateTo.format('HH:MM')}</time>
+            <time class="event__end-time" datetime="${dayjs(dateTo).toDate()}">${dayjs(dateTo).format('HH:MM')}</time>
           </p>
-          <p class="event__duration">${getDurationDates(dateFrom, dateTo)}</p>
+          <p class="event__duration">${getDurationDates(dayjs(dateFrom), dayjs(dateTo))}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
