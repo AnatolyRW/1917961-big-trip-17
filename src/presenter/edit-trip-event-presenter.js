@@ -15,14 +15,23 @@ export default class EditTripEventPresenter {
   #distinationModel = null;
 
   #changeTripEventMode = null;
+  #changeTripEventModel = null;
   #destroyEditTripEventPresenter = null;
 
-  constructor(listTripEventContainer, tripEventTypesOffersModel, destinationModel, itemTripEventView, destroyEditTripEventPresenter) {
+  constructor(
+    listTripEventContainer,
+    tripEventTypesOffersModel,
+    destinationModel,
+    itemTripEventView,
+    destroyEditTripEventPresenter,
+    changeTripEventModel
+  ) {
     this.#listTripEventContainer = listTripEventContainer;
     this.#offersModel = tripEventTypesOffersModel;
     this.#distinationModel = destinationModel;
     this.#itemTripEventView = itemTripEventView;
     this.#destroyEditTripEventPresenter = destroyEditTripEventPresenter;
+    this.#changeTripEventModel = changeTripEventModel;
   }
 
   get tripEventModel() {
@@ -53,11 +62,12 @@ export default class EditTripEventPresenter {
     this.#tripEventModel = tripEventsModel;
 
     this.#editTripEventView = new EditTripEventView(tripEventsModel, this.#distinationModel);
-    this.#renderOffersEditTripEvent(this.#offersModel);
+    this.#renderOffersEditTripEvent(this.#tripEventModel);
 
     this.#editTripEventView.setRollupEditClickHandler(this.#handleRollupEditClick);
     this.#editTripEventView.setSubmitEditHandler(this.#handleSubmitEdit);
     this.#editTripEventView.setRenderOffersEditTripEvent(this.#renderOffersEditTripEvent);
+    this.#editTripEventView.setDestinationChangeHandler(this.#handlerdestinationChange);
   }
 
   onEscKeyDown = (evt) => {
@@ -73,14 +83,20 @@ export default class EditTripEventPresenter {
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
-  #handleSubmitEdit = () => {
+  #handleSubmitEdit = (newItemTripEvent) => {
+    this.#changeTripEventModel(newItemTripEvent);
     this.#destroyEditTripEventPresenter();
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
-  #renderOffersEditTripEvent = (offersModel) => {
-    const offersEditTripEventPresenter = new OffersEditTripEventPresenter(this.#editTripEventView, this.#tripEventModel);
-    offersEditTripEventPresenter.init(offersModel);
+  #renderOffersEditTripEvent = (tripEventModel) => {
+    const offersEditTripEventPresenter = new OffersEditTripEventPresenter(this.#editTripEventView, tripEventModel);
+    offersEditTripEventPresenter.init(this.#offersModel);
+  };
+
+  #handlerdestinationChange = (nameCity) => {
+    const tmp = this.#distinationModel.find((element) => (element.name ===  nameCity));
+    return tmp;
   };
 
   desroy() {

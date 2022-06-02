@@ -13,7 +13,7 @@ const createTypeItemTripEvent = (tripEventTypes, type) => {
   let listTypeTripEvent = '';
   tripEventTypes.forEach((tripEventType) => {
     listTypeTripEvent +=
-    `<div class="event__type-item">
+      `<div class="event__type-item">
        <input id="event-type-${tripEventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${type === tripEventType ? 'checked' : ''}>
        <label class="event__type-label  event__type-label--${tripEventType}" for="event-type-${tripEventType}-1">${tripEventType}</label>
      </div>`;
@@ -101,19 +101,23 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
 `);
 };
 
-export default class TripEventEditView extends AbstractStatefulView {
+export default class EditTripEventView extends AbstractStatefulView {
 
   #distinationModel = null;
 
   constructor(tripEvent, distinationModel) {
     super();
-    this._state = TripEventEditView.parseTripEventToState(tripEvent);
+    this._state = EditTripEventView.parseTripEventToState(tripEvent);
     this.#distinationModel = distinationModel;
     this.#setInnerHandlers();
   }
 
   get template() {
     return createEditTripEventTemplate(this._state, this.#distinationModel);
+  }
+
+  get containerOffersElement() {
+    return this.element.querySelector('.event__available-offers');
   }
 
   setRollupEditClickHandler = (callback) => {
@@ -136,26 +140,36 @@ export default class TripEventEditView extends AbstractStatefulView {
     this._callback.submitEdit(this._state);
   };
 
+  setDestinationChangeHandler = (callback) => {
+    this._callback.destinationChange = callback;
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
+  };
+
+  #destinationChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      destination: this._callback.destinationChange(evt.target.value)
+    });
+    this._callback.renderOffers(this._state);
+  };
+
   setRenderOffersEditTripEvent = (callback) => {
     this._callback.renderOffers = callback;
   };
 
   #changeTypeTripEvent = (evt) => {
     evt.preventDefault();
-    if (evt.target.tagName !== 'LABEL') {
+    if (evt.target.tagName !== 'LABEL' || evt.target.innerText === this._state.type) {
       return;
     }
     this.updateElement({
+      offers: [],
       type: evt.target.innerText
     });
-    this._callback.renderOffers();
+    this._callback.renderOffers(this._state);
   };
 
-  get containerOffersElement() {
-    return this.element.querySelector('.event__available-offers');
-  }
-
-  static parseTripEventToState = (tripEvent) => ({ ...tripEvent});
+  static parseTripEventToState = (tripEvent) => ({ ...tripEvent });
 
   static parseStateToTripEvent = (state) => {
     const tripEvent = { ...state };
@@ -170,6 +184,7 @@ export default class TripEventEditView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setRollupEditClickHandler(this._callback.rollupEditClick);
     this.setSubmitEditHandler(this._callback.submitEdit);
+    this.setDestinationChangeHandler(this._callback.destinationChange);
   };
 
 }

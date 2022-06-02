@@ -89,7 +89,8 @@ export default class ItemTripEventPresenter {
       this.#offersModel,
       this.#distinationModel,
       this.#itemTripEventView,
-      this.#destroyEditTripEventPresenter
+      this.#destroyEditTripEventPresenter,
+      this.#changeTripEventModel
     );
     this.#editTripEventPresenter.init(this.#tripEventModel);
     replace(this.#editTripEventPresenter.editTripEvenView, this.#itemTripEventView);
