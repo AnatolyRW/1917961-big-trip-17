@@ -9,6 +9,7 @@ import ItemTripEventPresenter from './item-trip-event-presenter.js';
 import ListTripEventsView from '../view/list-trip-events-view.js';
 import NoTripEventsView from '../view/no-trip-events-view.js';
 
+
 export default class MainPresenter {
   #listTripEventsView = new ListTripEventsView();
   #noTripEventsView = new NoTripEventsView(FILTER.EVERYTHING);
@@ -20,15 +21,20 @@ export default class MainPresenter {
   #itemsTripEventModel = null;
   #itemsTripEventSourceModel = null;
   #offersModel = null;
+  #destinationModel = null;
 
 
-  constructor(itemsTripEventsModel, TripEventTypesOffersModel) {
+  constructor(itemsTripEventsModel, tripEventTypesOffersModel, destinationModel) {
     if (itemsTripEventsModel) {
       this.#itemsTripEventModel = [...itemsTripEventsModel.tripEvents];
       this.#itemsTripEventSourceModel = [...itemsTripEventsModel.tripEvents];
+
     }
-    if (TripEventTypesOffersModel) {
-      this.#offersModel = [...TripEventTypesOffersModel.offers];
+    if (tripEventTypesOffersModel) {
+      this.#offersModel = [...tripEventTypesOffersModel.offers];
+    }
+    if(destinationModel) {
+      this.#destinationModel = [...destinationModel.destination];
     }
     this.#filterTripEventsPresenter = new FilterTripEventsPresenter(this.#handleFilterChange);
     this.#sortTripEventsPresent = new SortTripEventsPresenter(this.#handleSortTypeChange);
@@ -72,7 +78,13 @@ export default class MainPresenter {
   }
 
   #renderTripEventItem = (itemTripEventModel) => {
-    const itemTripEventPresenter = new ItemTripEventPresenter(this.#listTripEventsView, this.#offersModel, this.#handleItemTripEventChange, this.#handleItemTripEventModeChange);
+    const itemTripEventPresenter = new ItemTripEventPresenter(
+      this.#listTripEventsView,
+      this.#offersModel,
+      this.#destinationModel,
+      this.#handleItemTripEventChange,
+      this.#handleItemTripEventModeChange
+    );
     itemTripEventPresenter.init(itemTripEventModel);
     this.#itemsTripEventPresenter.set(itemTripEventModel.id, itemTripEventPresenter);
   };
