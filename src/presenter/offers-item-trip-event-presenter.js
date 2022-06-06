@@ -21,7 +21,7 @@ export default class OffersItemTripEventPresenter {
   }
 
   #renderItemTripEventOffers() {
-    this.#offersWithType = this.#offersModel.find((offer) => (offer.type === this.#tripEventModel.type));
+    this.#offersWithType = this.#offersModel.offers.find((offer) => (offer.type === this.#tripEventModel.type));
     for (let j = 0; j < this.#offersWithType.offers.length; j++) {
       this.#offerItemTripEventViews.push(new OfferItemTripEventView(this.#offersWithType.offers[j], this.#tripEventModel.offers));
       render(this.#offerItemTripEventViews[j], this.#tripEventView.containerOffersElement);

@@ -2,6 +2,7 @@ import { MODE } from '../const.js';
 import { remove } from '../framework/render.js';
 import EditTripEventView from '../view/edit-trip-event-view.js';
 import OffersEditTripEventPresenter from './offers-edit-trip-event-presenter';
+import {UserAction, UpdateType} from '../const.js';
 
 export default class EditTripEventPresenter {
 
@@ -15,7 +16,7 @@ export default class EditTripEventPresenter {
   #distinationModel = null;
 
   #changeTripEventMode = null;
-  #changeTripEventModel = null;
+  #changeViewAction = null;
   #destroyEditTripEventPresenter = null;
 
   constructor(
@@ -24,14 +25,14 @@ export default class EditTripEventPresenter {
     destinationModel,
     itemTripEventView,
     destroyEditTripEventPresenter,
-    changeTripEventModel
+    changeViewAction
   ) {
     this.#listTripEventContainer = listTripEventContainer;
     this.#offersModel = tripEventTypesOffersModel;
     this.#distinationModel = destinationModel;
     this.#itemTripEventView = itemTripEventView;
     this.#destroyEditTripEventPresenter = destroyEditTripEventPresenter;
-    this.#changeTripEventModel = changeTripEventModel;
+    this.#changeViewAction = changeViewAction;
   }
 
   get tripEventModel() {
@@ -83,8 +84,13 @@ export default class EditTripEventPresenter {
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
-  #handleSubmitEdit = (newItemTripEvent) => {
-    this.#changeTripEventModel(newItemTripEvent);
+  #handleSubmitEdit = (changeItemTripEvent) => {
+    //this.#changeViewAction(newItemTripEvent);
+    this.#changeViewAction(
+      UserAction.UPDATE_TRIP_EVENT,
+      UpdateType.PATCH,
+      {...changeItemTripEvent}
+    );
     this.#destroyEditTripEventPresenter();
     document.removeEventListener('keydown', this.onEscKeyDown);
   };

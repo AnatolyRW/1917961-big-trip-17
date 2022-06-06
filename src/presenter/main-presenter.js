@@ -1,6 +1,6 @@
-import { FILTER } from '../const.js';
+import { FILTER, SORT_TYPE, UpdateType, UserAction } from '../const.js';
 import { remove, render } from '../framework/render.js';
-import { updateItemTripEventModel } from '../util/common.js';
+import { sortPrice, sortTime, sortDay } from '../util/common.js';
 
 import SortTripEventsPresenter from '../presenter/sort-trip-evets-presenter.js';
 import FilterTripEventsPresenter from './filter-trip-events-presenter.js';
@@ -18,35 +18,86 @@ export default class MainPresenter {
   #filterTripEventsPresenter = null;
   #itemsTripEventPresenter = new Map();
 
-  #itemsTripEventModel = null;
-  #itemsTripEventSourceModel = null;
+  #itemTripEventsModel = null;
+  //#tripEventSourceModel = null;
   #offersModel = null;
   #destinationModel = null;
 
+  #currentSortType = SORT_TYPE.DAY;
+  #currentFilter = FILTER.EVERYTHING;
 
-  constructor(itemsTripEventsModel, tripEventTypesOffersModel, destinationModel) {
-    if (itemsTripEventsModel) {
-      this.#itemsTripEventModel = [...itemsTripEventsModel.tripEvents];
-      this.#itemsTripEventSourceModel = [...itemsTripEventsModel.tripEvents];
 
-    }
-    if (tripEventTypesOffersModel) {
-      this.#offersModel = [...tripEventTypesOffersModel.offers];
-    }
-    if(destinationModel) {
-      this.#destinationModel = [...destinationModel.destination];
-    }
+  constructor(itemsTripEventsModel, offersModel, destinationModel) {
     this.#filterTripEventsPresenter = new FilterTripEventsPresenter(this.#handleFilterChange);
     this.#sortTripEventsPresent = new SortTripEventsPresenter(this.#handleSortTypeChange);
+
+    this.#itemTripEventsModel = itemsTripEventsModel;
+    this.#offersModel = offersModel;
+    this.#destinationModel = destinationModel;
+
+    this.#itemTripEventsModel.addObserver(this.#handleModelEvent);
+
+    //this.#tripEventSourceModel = tripEventsModel.tripEvents; //?
+  }
+
+  get tripEvents () {
+    switch (this.#currentSortType) {
+      case SORT_TYPE.DAY:
+        return [...this.#itemTripEventsModel.tripEvents].sort(sortDay);
+      case SORT_TYPE.PRICE:
+        return [...this.#itemTripEventsModel.tripEvents].sort(sortPrice);
+      case SORT_TYPE.TIME:
+        return [...this.#itemTripEventsModel.tripEvents].sort(sortTime);
+    }
+    return this.#itemTripEventsModel.tripEvents;
   }
 
   init() {
     this.renderMain();
   }
 
-  #handleItemTripEventChange = (updatedItemTripEventModel) => {
-    this.#itemsTripEventSourceModel = updateItemTripEventModel(this.#itemsTripEventSourceModel, updatedItemTripEventModel);
-    this.#itemsTripEventPresenter.get(updatedItemTripEventModel.id).init(updatedItemTripEventModel);
+  //#handleItemTripEventChange = (updatedItemTripEventModel) => {
+  //this.#itemsTripEventSourceModel = updateItemTripEventModel(this.#itemsTripEventSourceModel, updatedItemTripEventModel);
+  //this.#itemsTripEventPresenter.get(updatedItemTripEventModel.id).init(updatedItemTripEventModel);
+  //};
+
+  #handleViewAction = (actionType, updateType, update) => {
+    //console.log(actionType, updateType, update);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_TRIP_EVENT:
+        this.#itemTripEventsModel.updateTripEvent(updateType, update);
+        break;
+      case UserAction.ADD_TRIP_EVENT:
+        this.#itemTripEventsModel.addTripEvent(updateType, update);
+        break;
+      case UserAction.DELETE_TRIP_EVENT:
+        this.#itemTripEventsModel.deleteTripEvent(updateType, update);
+        break;
+    }
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    //console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
+    switch (updateType) {
+      case UpdateType.PATCH:
+        // - обновить часть списка (например, когда поменялось описание)
+        this.#itemsTripEventPresenter.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        // - обновить список (например, когда задача ушла в архив)
+        break;
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        break;
+    }
   };
 
   #handleItemTripEventModeChange = () => {
@@ -54,9 +105,12 @@ export default class MainPresenter {
   };
 
   #handleFilterChange = (idFilter) => {
-    this.#itemsTripEventModel = this.#filterTripEventsPresenter.filterChange(idFilter, this.#itemsTripEventSourceModel);
+    if(this.#currentFilter === idFilter) {
+      return;
+    }
+    this.#itemTripEventsModel = this.#filterTripEventsPresenter.filterChange(idFilter, this.tripEvents);
     this.#clearListTripEventItems();
-    if (!this.#itemsTripEventModel.length) {
+    if (!this.tripEvents.length) {
       this.#noTripEventsView.idFilter = idFilter;
       render(this.#noTripEventsView, this.#noTripEventsView.container);
       return;
@@ -65,7 +119,10 @@ export default class MainPresenter {
   };
 
   #handleSortTypeChange = (sortType) => {
-    this.#sortTripEventsPresent.sortChange(sortType, this.#itemsTripEventModel);
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+    this.#currentSortType = sortType;
     this.#clearListTripEventItems();
     this.#renderlistTripEventItems();
   };
@@ -74,7 +131,7 @@ export default class MainPresenter {
   #renderlistTripEventItems() {
     remove(this.#noTripEventsView);
     render(this.#listTripEventsView, this.#listTripEventsView.container);
-    this.#itemsTripEventModel.forEach(this.#renderTripEventItem);
+    this.tripEvents.forEach(this.#renderTripEventItem);
   }
 
   #renderTripEventItem = (itemTripEventModel) => {
@@ -82,7 +139,7 @@ export default class MainPresenter {
       this.#listTripEventsView,
       this.#offersModel,
       this.#destinationModel,
-      this.#handleItemTripEventChange,
+      this.#handleViewAction,
       this.#handleItemTripEventModeChange
     );
     itemTripEventPresenter.init(itemTripEventModel);
@@ -90,7 +147,7 @@ export default class MainPresenter {
   };
 
   renderMain() {
-    if (!this.#itemsTripEventModel.length) {
+    if (!this.tripEvents.length) {
       render(this.#noTripEventsView, this.#noTripEventsView.container);
       return;
     }

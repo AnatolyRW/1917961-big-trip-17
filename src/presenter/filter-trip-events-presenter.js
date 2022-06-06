@@ -30,20 +30,20 @@ export default class FilterTripEventsPresenter {
     this.#changeFilter(idFilter);
   };
 
-  filterChange = (idFilter, itemsTripEventSourceModel) => {
+  filterChange = (idFilter, tripEventSourceModel) => {
     let itemsTripEventModel = [];
     switch (idFilter) {
       case FILTER.FUTURE:
-        itemsTripEventModel = itemsTripEventSourceModel.filter(applayFilterFuture);
+        itemsTripEventModel = tripEventSourceModel.filter(applayFilterFuture);
         break;
       case FILTER.PAST:
-        itemsTripEventModel = itemsTripEventSourceModel.filter(applayFilterPast);
+        itemsTripEventModel = tripEventSourceModel.filter(applayFilterPast);
         break;
       case FILTER.EVERYTHING:
-        itemsTripEventModel = itemsTripEventSourceModel;
+        itemsTripEventModel = tripEventSourceModel;
         break;
       default:
-        itemsTripEventModel = itemsTripEventSourceModel;
+        itemsTripEventModel = tripEventSourceModel;
     }
     return itemsTripEventModel;
   };

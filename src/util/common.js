@@ -32,20 +32,6 @@ const getDurationDates = (dateFrom, dateTo) => {
 
 };
 
-const updateItemTripEventModel = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
-
 const applayFilterFuture = (itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo);
 
 const applayFilterPast = (itemTripEventModel) => dayjs().isAfter(itemTripEventModel.dateFrom);
@@ -58,5 +44,5 @@ const sortDay = (a, b) => dayjs(b.dateFrom).diff(a.dateFrom);
 
 export {
   getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray,
-  updateItemTripEventModel, applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay
+  applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay
 };

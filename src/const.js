@@ -15,4 +15,16 @@ const SORT_TYPE = {
   PRICE: 'sort-price'
 };
 
-export { MODE, FILTER, SORT_TYPE };
+const UserAction = {
+  UPDATE_TRIP_EVENT: 'UPDATE_TRIP_EVENT',
+  ADD_TRIP_EVENT: 'ADD_TRIP_EVENT',
+  DELETE_TRIP_EVENT: 'DELETE_TRIP_EVENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export { MODE, FILTER, SORT_TYPE, UpdateType, UserAction };

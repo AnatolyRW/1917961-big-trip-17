@@ -7,7 +7,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const createDestinationList = (distinationModel) => {
   let destinationList = '';
-  distinationModel.forEach((element) => {
+  distinationModel.destination.forEach((element) => {
     destinationList += `<option value="${element.name}"></option>`;
   });
   return destinationList;
