@@ -76,7 +76,7 @@ export default class ItemTripEventPresenter {
     }
 
     if (this.#tripEventMode === MODE.EDITING) {
-      replace(this.#itemTripEventView, prevEditTripEvenView);
+      this.#closeEditTripEvent();
     }
 
     remove(prevItemTripEventView);
@@ -90,7 +90,7 @@ export default class ItemTripEventPresenter {
       this.#offersModel,
       this.#distinationModel,
       this.#itemTripEventView,
-      this.#destroyEditTripEventPresenter,
+      this.#closeEditTripEvent,
       this.#changeViewAction
     );
     this.#editTripEventPresenter.init(this.#tripEventModel);
@@ -98,7 +98,6 @@ export default class ItemTripEventPresenter {
     this.#changeTripEventMode();
     this.#tripEventMode = MODE.EDITING;
     this.#editTripEvenView = this.#editTripEventPresenter.editTripEvenView;
-    //this.#itemTripEventView = null;
   };
 
   #replaceEditToItem = () => {
@@ -125,7 +124,7 @@ export default class ItemTripEventPresenter {
 
   resetView = () => {
     if (this.#tripEventMode !== MODE.DEFAULT) {
-      this.#destroyEditTripEventPresenter();
+      this.#closeEditTripEvent();
     }
   };
 
@@ -133,7 +132,7 @@ export default class ItemTripEventPresenter {
     remove(this.#itemTripEventView);
   }
 
-  #destroyEditTripEventPresenter = () => {
+  #closeEditTripEvent = () => {
     this.#replaceEditToItem();
     this.#tripEventMode = MODE.DEFAULT;
     this.#editTripEventPresenter.desroy();

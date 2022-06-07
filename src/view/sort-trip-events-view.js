@@ -31,15 +31,15 @@ const createSortTripEventsTemplate = (idTypeSort) => (`
 
 export default class SortTripEventsView extends AbstractView {
 
-  #idTypeSort = null;
+  #sortType = null;
 
-  constructor(idTypeSort) {
+  constructor(sortType) {
     super();
-    this.#idTypeSort = idTypeSort;
+    this.#sortType = sortType;
   }
 
   get template() {
-    return createSortTripEventsTemplate(this.#idTypeSort);
+    return createSortTripEventsTemplate(this.#sortType);
   }
 
   setSortChangeHandler = (callback) => {
@@ -51,9 +51,9 @@ export default class SortTripEventsView extends AbstractView {
     if (evt.target.tagName !== 'INPUT') {
       return;
     }
-    this.#idTypeSort = evt.target.id;
+    this.#sortType = evt.target.id;
     evt.preventDefault();
-    this._callback.change(this.#idTypeSort);
+    this._callback.change(this.#sortType);
   };
 
   get container() {

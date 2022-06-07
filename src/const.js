@@ -3,13 +3,13 @@ const MODE = {
   EDITING: 'EDITING'
 };
 
-const FILTER = {
+const Filter = {
   EVERYTHING: 'filter-everything',
   FUTURE: 'filter-future',
   PAST: 'filter-past'
 };
 
-const SORT_TYPE = {
+const SortType = {
   DAY: 'sort-day',
   TIME: 'sort-time',
   PRICE: 'sort-price'
@@ -27,4 +27,4 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
-export { MODE, FILTER, SORT_TYPE, UpdateType, UserAction };
+export { MODE, Filter, SortType, UpdateType, UserAction };

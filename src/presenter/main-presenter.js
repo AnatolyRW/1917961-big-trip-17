@@ -1,4 +1,4 @@
-import { FILTER, SORT_TYPE, UpdateType, UserAction } from '../const.js';
+import { Filter, SortType, UpdateType, UserAction } from '../const.js';
 import { remove, render } from '../framework/render.js';
 import { sortPrice, sortTime, sortDay } from '../util/common.js';
 
@@ -12,24 +12,22 @@ import NoTripEventsView from '../view/no-trip-events-view.js';
 
 export default class MainPresenter {
   #listTripEventsView = new ListTripEventsView();
-  #noTripEventsView = new NoTripEventsView(FILTER.EVERYTHING);
+  #noTripEventsView = new NoTripEventsView(Filter.EVERYTHING);
 
   #sortTripEventsPresent = null;
   #filterTripEventsPresenter = null;
   #itemsTripEventPresenter = new Map();
 
   #itemTripEventsModel = null;
-  //#tripEventSourceModel = null;
   #offersModel = null;
   #destinationModel = null;
 
-  #currentSortType = SORT_TYPE.DAY;
-  #currentFilter = FILTER.EVERYTHING;
+  #currentSortType = SortType.DAY;
+  #currentFilter = Filter.EVERYTHING;
 
 
   constructor(itemsTripEventsModel, offersModel, destinationModel) {
     this.#filterTripEventsPresenter = new FilterTripEventsPresenter(this.#handleFilterChange);
-    this.#sortTripEventsPresent = new SortTripEventsPresenter(this.#handleSortTypeChange);
 
     this.#itemTripEventsModel = itemsTripEventsModel;
     this.#offersModel = offersModel;
@@ -42,31 +40,21 @@ export default class MainPresenter {
 
   get tripEvents () {
     switch (this.#currentSortType) {
-      case SORT_TYPE.DAY:
+      case SortType.DAY:
         return [...this.#itemTripEventsModel.tripEvents].sort(sortDay);
-      case SORT_TYPE.PRICE:
+      case SortType.PRICE:
         return [...this.#itemTripEventsModel.tripEvents].sort(sortPrice);
-      case SORT_TYPE.TIME:
+      case SortType.TIME:
         return [...this.#itemTripEventsModel.tripEvents].sort(sortTime);
     }
     return this.#itemTripEventsModel.tripEvents;
   }
 
   init() {
-    this.renderMain();
+    this.#renderlist();
   }
 
-  //#handleItemTripEventChange = (updatedItemTripEventModel) => {
-  //this.#itemsTripEventSourceModel = updateItemTripEventModel(this.#itemsTripEventSourceModel, updatedItemTripEventModel);
-  //this.#itemsTripEventPresenter.get(updatedItemTripEventModel.id).init(updatedItemTripEventModel);
-  //};
-
   #handleViewAction = (actionType, updateType, update) => {
-    //console.log(actionType, updateType, update);
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
     switch (actionType) {
       case UserAction.UPDATE_TRIP_EVENT:
         this.#itemTripEventsModel.updateTripEvent(updateType, update);
@@ -81,21 +69,17 @@ export default class MainPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
-    //console.log(updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
         this.#itemsTripEventPresenter.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
+        this.#clearList();
+        this.#renderlist();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
+        this.#clearList();
+        this.#renderlist(true);
         break;
     }
   };
@@ -109,13 +93,13 @@ export default class MainPresenter {
       return;
     }
     this.#itemTripEventsModel = this.#filterTripEventsPresenter.filterChange(idFilter, this.tripEvents);
-    this.#clearListTripEventItems();
+    this.#clearList();
     if (!this.tripEvents.length) {
       this.#noTripEventsView.idFilter = idFilter;
       render(this.#noTripEventsView, this.#noTripEventsView.container);
       return;
     }
-    this.#renderlistTripEventItems();
+    this.#renderlist();
   };
 
   #handleSortTypeChange = (sortType) => {
@@ -123,13 +107,27 @@ export default class MainPresenter {
       return;
     }
     this.#currentSortType = sortType;
-    this.#clearListTripEventItems();
-    this.#renderlistTripEventItems();
+    this.#clearList();
+    this.#renderlist();
   };
 
+  #renderSort = () => {
+    this.#sortTripEventsPresent = new SortTripEventsPresenter(this.#currentSortType);
+    this.#sortTripEventsPresent.init(this.#handleSortTypeChange);
+  };
 
-  #renderlistTripEventItems() {
-    remove(this.#noTripEventsView);
+  #renderNoTripEventsView = () => {
+    render(this.#noTripEventsView, this.#noTripEventsView.container);
+  };
+
+  #renderlist() {
+    const tripEvents = this.tripEvents;
+    const tripEventsCount = tripEvents.length;
+    if (tripEventsCount === 0) {
+      this.#renderNoTripEventsView();
+      return;
+    }
+    this.#renderSort();
     render(this.#listTripEventsView, this.#listTripEventsView.container);
     this.tripEvents.forEach(this.#renderTripEventItem);
   }
@@ -146,19 +144,14 @@ export default class MainPresenter {
     this.#itemsTripEventPresenter.set(itemTripEventModel.id, itemTripEventPresenter);
   };
 
-  renderMain() {
-    if (!this.tripEvents.length) {
-      render(this.#noTripEventsView, this.#noTripEventsView.container);
-      return;
-    }
-    this.#sortTripEventsPresent.init();
-    this.#renderlistTripEventItems();
-    this.#filterTripEventsPresenter.init();
-  }
-
-  #clearListTripEventItems() {
+  #clearList(resetSortType = false) {
     this.#itemsTripEventPresenter.forEach((presenter) => presenter.desroy());
     this.#itemsTripEventPresenter.clear();
+    this.#sortTripEventsPresent.desroy();
+    remove(this.#noTripEventsView);
     remove(this.#listTripEventsView,);
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
   }
 }

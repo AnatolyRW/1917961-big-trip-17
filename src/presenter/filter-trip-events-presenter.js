@@ -1,4 +1,4 @@
-import { FILTER } from '../const.js';
+import { Filter } from '../const.js';
 import { applayFilterFuture, applayFilterPast } from '../util/common.js';
 import FilterTripEventsView from '../view/filter-trip-events-view';
 import dayjs from 'dayjs';
@@ -8,7 +8,7 @@ dayjs.extend(utc);
 
 export default class FilterTripEventsPresenter {
 
-  #filterTripEventsView = new FilterTripEventsView(FILTER.EVERYTHING);
+  #filterTripEventsView = new FilterTripEventsView(Filter.EVERYTHING);
   #noTripEventsView = null;
 
   #changeFilter = null;
@@ -33,13 +33,13 @@ export default class FilterTripEventsPresenter {
   filterChange = (idFilter, tripEventSourceModel) => {
     let itemsTripEventModel = [];
     switch (idFilter) {
-      case FILTER.FUTURE:
+      case Filter.FUTURE:
         itemsTripEventModel = tripEventSourceModel.filter(applayFilterFuture);
         break;
-      case FILTER.PAST:
+      case Filter.PAST:
         itemsTripEventModel = tripEventSourceModel.filter(applayFilterPast);
         break;
-      case FILTER.EVERYTHING:
+      case Filter.EVERYTHING:
         itemsTripEventModel = tripEventSourceModel;
         break;
       default:

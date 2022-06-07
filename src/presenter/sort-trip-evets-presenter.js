@@ -1,41 +1,44 @@
-import { SORT_TYPE } from '../const.js';
+import { SortType } from '../const.js';
 import { sortPrice, sortTime, sortDay } from '../util/common.js';
 import SortTripEventsView from '../view/sort-trip-events-view.js';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import { render } from '../framework/render';
+import { render, remove } from '../framework/render';
 dayjs.extend(utc);
 
 export default class SortTripEventsPresenter {
 
-  #sortTripEventsView = new SortTripEventsView(SORT_TYPE.DAY);
+  #sortTripEventsView = new SortTripEventsView(SortType.DAY);
 
-  #changeSort = null;
+  #sortTypeChange = null;
+  #currentSortType = null;
 
-  constructor(changeSort) {
-    this.#changeSort = changeSort;
+  constructor(sortType = SortType.DAY) {
+    this.#currentSortType  = sortType;
   }
 
-  init() {
+  init(sortTypeChange) {
+    this.#sortTypeChange = sortTypeChange;
+    this.#sortTripEventsView = new SortTripEventsView(this.#currentSortType);
     render(this.#sortTripEventsView, this.#sortTripEventsView.container);
     this.#sortTripEventsView.setSortChangeHandler(this.#handleSortChange);
   }
 
   #handleSortChange = (idSort) => {
-    this.#changeSort(idSort);
+    this.#sortTypeChange(idSort);
   };
 
   sortChange = (idSort, itemsTripEventSourceModel) => {
 
     switch (idSort) {
-      case SORT_TYPE.PRICE:
+      case SortType.PRICE:
         itemsTripEventSourceModel.sort(sortPrice);
         break;
-      case SORT_TYPE.TIME:
+      case SortType.TIME:
         itemsTripEventSourceModel.sort(sortTime);
         break;
-      case SORT_TYPE.DAY:
+      case SortType.DAY:
         itemsTripEventSourceModel.sort(sortDay);
         break;
       default:
@@ -43,5 +46,9 @@ export default class SortTripEventsPresenter {
     }
 
   };
+
+  desroy() {
+    remove(this.#sortTripEventsView);
+  }
 
 }

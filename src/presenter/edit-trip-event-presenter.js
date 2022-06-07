@@ -66,9 +66,10 @@ export default class EditTripEventPresenter {
     this.#renderOffersEditTripEvent(this.#tripEventModel);
 
     this.#editTripEventView.setRollupEditClickHandler(this.#handleRollupEditClick);
-    this.#editTripEventView.setSubmitEditHandler(this.#handleSubmitEdit);
+    this.#editTripEventView.setSaveClickHandler(this.#handlerSaveClick);
+    this.#editTripEventView.setDeleteClickHandler(this.#handlerDeleteClick);
     this.#editTripEventView.setRenderOffersEditTripEvent(this.#renderOffersEditTripEvent);
-    this.#editTripEventView.setDestinationChangeHandler(this.#handlerdestinationChange);
+    this.#editTripEventView.setDestinationChangeHandler(this.#handlerDestinationChange);
   }
 
   onEscKeyDown = (evt) => {
@@ -84,14 +85,22 @@ export default class EditTripEventPresenter {
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
-  #handleSubmitEdit = (changeItemTripEvent) => {
-    //this.#changeViewAction(newItemTripEvent);
+  #handlerSaveClick = (changeItemTripEvent) => {
     this.#changeViewAction(
       UserAction.UPDATE_TRIP_EVENT,
       UpdateType.PATCH,
       {...changeItemTripEvent}
     );
-    this.#destroyEditTripEventPresenter();
+    //this.#destroyEditTripEventPresenter();
+    document.removeEventListener('keydown', this.onEscKeyDown);
+  };
+
+  #handlerDeleteClick = (itemTripEvent) => {
+    this.#changeViewAction(
+      UserAction.DELETE_TRIP_EVENT,
+      UpdateType.MINOR,
+      {...itemTripEvent}
+    );
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
@@ -100,7 +109,7 @@ export default class EditTripEventPresenter {
     offersEditTripEventPresenter.init(this.#offersModel);
   };
 
-  #handlerdestinationChange = (nameCity) => {
+  #handlerDestinationChange = (nameCity) => {
     const tmp = this.#distinationModel.find((element) => (element.name ===  nameCity));
     return tmp;
   };

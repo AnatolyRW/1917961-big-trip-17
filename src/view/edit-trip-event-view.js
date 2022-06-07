@@ -137,14 +137,14 @@ export default class EditTripEventView extends AbstractStatefulView {
     this._callback.rollupEditClick();
   };
 
-  setSubmitEditHandler = (callback) => {
-    this._callback.submitEdit = callback;
-    this.element.querySelector('form').addEventListener('submit', this.#submitEditHandler);
+  setSaveClickHandler = (callback) => {
+    this._callback.saveClick = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#saveClickHandler);
   };
 
-  #submitEditHandler = (evt) => {
+  #saveClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.submitEdit(this._state);
+    this._callback.SaveClick(this._state);
   };
 
   setDestinationChangeHandler = (callback) => {
@@ -159,6 +159,17 @@ export default class EditTripEventView extends AbstractStatefulView {
     });
     this._callback.renderOffers(this._state);
   };
+
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteClickHandler);
+  };
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(this._state);
+  };
+
 
   setRenderOffersEditTripEvent = (callback) => {
     this._callback.renderOffers = callback;
@@ -190,7 +201,7 @@ export default class EditTripEventView extends AbstractStatefulView {
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setRollupEditClickHandler(this._callback.rollupEditClick);
-    this.setSubmitEditHandler(this._callback.submitEdit);
+    this.setSaveClickHandler(this._callback.submitEdit);
     this.setDestinationChangeHandler(this._callback.destinationChange);
     this.#setDateFromPicker();
     this.#setDateToPicker();
