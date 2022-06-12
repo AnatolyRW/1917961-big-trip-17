@@ -5,12 +5,30 @@ import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
+const isValidDestination = (DestinationString, destinations) => {
+  let isValid = false;
+  destinations.forEach((element) => {
+    if (DestinationString === element.name) { isValid = true; }
+  });
+  return isValid;
+};
+
 const createDestinationList = (distinationModel) => {
   let destinationList = '';
-  distinationModel.destination.forEach((element) => {
+  distinationModel.destinations.forEach((element) => {
     destinationList += `<option value="${element.name}"></option>`;
   });
   return destinationList;
+};
+
+const patternDestination = (distinationModel) => {
+  const destinations = distinationModel.destinations;
+  let patternDestinationValue = 'pattern="';
+  for (let i = 0; i < destinations.length - 1; i++) {
+    patternDestinationValue += `${destinations[i].name}|`;
+  }
+  patternDestinationValue += `${destinations[destinations.length - 1].name}"`;
+  return patternDestinationValue;
 };
 
 const createTypeItemTripEvent = (tripEventTypes, type) => {
@@ -57,11 +75,15 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+          <input class="event__input  event__input--destination"
+          id="event-destination-1"
+          type="text"
+          name="event-destination"
+          value="${destination.name}"
+          list="destination-list-1"
+          ${patternDestination(distinationModel)}>
           <datalist id="destination-list-1">
-
             ${createDestinationList(distinationModel)}
-
           </datalist>
         </div>
 
@@ -144,7 +166,7 @@ export default class EditTripEventView extends AbstractStatefulView {
 
   #saveClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.SaveClick(this._state);
+    this._callback.saveClick(this._state);
   };
 
   setDestinationChangeHandler = (callback) => {
@@ -154,6 +176,9 @@ export default class EditTripEventView extends AbstractStatefulView {
 
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
+    if (!isValidDestination(evt.target.value, this.#distinationModel.destinations)) {
+      return;
+    }
     this.updateElement({
       destination: this._callback.destinationChange(evt.target.value)
     });
@@ -201,7 +226,7 @@ export default class EditTripEventView extends AbstractStatefulView {
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setRollupEditClickHandler(this._callback.rollupEditClick);
-    this.setSaveClickHandler(this._callback.submitEdit);
+    this.setSaveClickHandler(this._callback.saveClick);
     this.setDestinationChangeHandler(this._callback.destinationChange);
     this.#setDateFromPicker();
     this.#setDateToPicker();

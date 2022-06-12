@@ -1,9 +1,9 @@
-const MODE = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING'
+const Mode = {
+  DEFAULT: false,
+  EDITING: true
 };
 
-const Filter = {
+const FilterType = {
   EVERYTHING: 'filter-everything',
   FUTURE: 'filter-future',
   PAST: 'filter-past'
@@ -27,4 +27,6 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
-export { MODE, Filter, SortType, UpdateType, UserAction };
+const EIGHT = 8;
+
+export { Mode, FilterType, SortType, UpdateType, UserAction, EIGHT };

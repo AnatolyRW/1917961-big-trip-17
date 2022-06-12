@@ -1,5 +1,4 @@
 import { SortType } from '../const.js';
-import { sortPrice, sortTime, sortDay } from '../util/common.js';
 import SortTripEventsView from '../view/sort-trip-events-view.js';
 
 import dayjs from 'dayjs';
@@ -27,24 +26,6 @@ export default class SortTripEventsPresenter {
 
   #handleSortChange = (idSort) => {
     this.#sortTypeChange(idSort);
-  };
-
-  sortChange = (idSort, itemsTripEventSourceModel) => {
-
-    switch (idSort) {
-      case SortType.PRICE:
-        itemsTripEventSourceModel.sort(sortPrice);
-        break;
-      case SortType.TIME:
-        itemsTripEventSourceModel.sort(sortTime);
-        break;
-      case SortType.DAY:
-        itemsTripEventSourceModel.sort(sortDay);
-        break;
-      default:
-        itemsTripEventSourceModel.sort(sortDay);
-    }
-
   };
 
   desroy() {

@@ -8,7 +8,7 @@ export default class ItemTripEventsModel extends Observable {
 
   constructor(tripEventTypesOffers, destinationModel) {
     super();
-    this.#tripEvents = Array.from({length: 20}, generateTripEvent(tripEventTypesOffers.offers, destinationModel.destination));
+    this.#tripEvents = Array.from({length: 20}, generateTripEvent(tripEventTypesOffers.offers, destinationModel.destinations));
   }
 
   get tripEvents() {

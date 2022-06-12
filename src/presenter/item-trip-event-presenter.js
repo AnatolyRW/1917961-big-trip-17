@@ -1,33 +1,33 @@
-import { MODE } from '../const.js';
+import { Mode } from '../const.js';
 import { remove, render, replace } from '../framework/render.js';
 import ItemTripEventView from '../view/item-trip-event-view.js';
 import EditTripEventPresenter from './edit-trip-event-presenter.js';
 import OffersItemTripEventPresenter from './offers-item-trip-event-presenter.js';
-import {UserAction, UpdateType} from '../const.js';
+import { UserAction, UpdateType } from '../const.js';
 
 export default class ItemTripEventPresenter {
 
-  #listTripEventContainer = null;
+  #listContainer = null;
   #itemTripEventView = null;
   #editTripEvenView = null;
 
   #tripEventModel = null;
   #offersModel = null;
-  #tripEventMode = MODE.DEFAULT;
+  #isEdit = false;
   #distinationModel = null;
 
   #changeViewAction = null;
-  #changeTripEventMode = null;
+  #resetEditMode = null;
 
   #editTripEventPresenter = null;
 
 
-  constructor(listTripEventContainer, tripEventTypesOffersModel, distinationModel, changeViewAction, changeTripEventMode) {
-    this.#listTripEventContainer = listTripEventContainer;
+  constructor(listTripEventContainer, tripEventTypesOffersModel, distinationModel, changeViewAction, resetEditMode) {
+    this.#listContainer = listTripEventContainer;
     this.#offersModel = tripEventTypesOffersModel;
     this.#distinationModel = distinationModel;
     this.#changeViewAction = changeViewAction;
-    this.#changeTripEventMode = changeTripEventMode;
+    this.#resetEditMode = resetEditMode;
   }
 
   get tripEventModel() {
@@ -51,7 +51,7 @@ export default class ItemTripEventPresenter {
   }
 
   get listTripEventContainer() {
-    return this.#listTripEventContainer;
+    return this.#listContainer;
   }
 
   init(tripEventsModel) {
@@ -67,36 +67,25 @@ export default class ItemTripEventPresenter {
     this.#itemTripEventView.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     if (prevItemTripEventView === null & prevEditTripEvenView === null) {
-      render(this.#itemTripEventView, this.#listTripEventContainer.element);
+      render(this.#itemTripEventView, this.#listContainer.element);
       return;
     }
 
-    if (this.#tripEventMode === MODE.DEFAULT) {
+    if (!this.#isEdit) {
       replace(this.#itemTripEventView, prevItemTripEventView);
     }
-
-    if (this.#tripEventMode === MODE.EDITING) {
-      this.#closeEditTripEvent();
-    }
+    this.resetView();
 
     remove(prevItemTripEventView);
     remove(prevEditTripEvenView);
-
   }
 
   #replaceItemToEdit = () => {
-    this.#editTripEventPresenter = new EditTripEventPresenter(
-      this.#listTripEventContainer,
-      this.#offersModel,
-      this.#distinationModel,
-      this.#itemTripEventView,
-      this.#closeEditTripEvent,
-      this.#changeViewAction
-    );
+    this.#editTripEventPresenter = new EditTripEventPresenter(this.#listContainer, this.#offersModel, this.#distinationModel, this.#closeEditHandler, this.#changeViewAction);
     this.#editTripEventPresenter.init(this.#tripEventModel);
     replace(this.#editTripEventPresenter.editTripEvenView, this.#itemTripEventView);
-    this.#changeTripEventMode();
-    this.#tripEventMode = MODE.EDITING;
+    this.#resetEditMode();
+    this.#isEdit = Mode.EDITING;
     this.#editTripEvenView = this.#editTripEventPresenter.editTripEvenView;
   };
 
@@ -123,8 +112,8 @@ export default class ItemTripEventPresenter {
   }
 
   resetView = () => {
-    if (this.#tripEventMode !== MODE.DEFAULT) {
-      this.#closeEditTripEvent();
+    if (this.#isEdit) {
+      this.#closeEditHandler();
     }
   };
 
@@ -132,10 +121,10 @@ export default class ItemTripEventPresenter {
     remove(this.#itemTripEventView);
   }
 
-  #closeEditTripEvent = () => {
+  #closeEditHandler = () => {
     this.#replaceEditToItem();
-    this.#tripEventMode = MODE.DEFAULT;
-    this.#editTripEventPresenter.desroy();
+    this.#isEdit = Mode.DEFAULT;
+    this.#editTripEventPresenter.editTripEventView = null;
     this.#editTripEventPresenter = null;
   };
 

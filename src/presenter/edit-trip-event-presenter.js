@@ -1,37 +1,26 @@
-import { MODE } from '../const.js';
 import { remove } from '../framework/render.js';
 import EditTripEventView from '../view/edit-trip-event-view.js';
 import OffersEditTripEventPresenter from './offers-edit-trip-event-presenter';
-import {UserAction, UpdateType} from '../const.js';
+import { UserAction, UpdateType } from '../const.js';
 
 export default class EditTripEventPresenter {
 
-  #listTripEventContainer = null;
+  #listContainer = null;
   #itemTripEventView = null;
   #editTripEventView = null;
 
   #tripEventModel = null;
   #offersModel = null;
-  #tripEventMode = MODE.DEFAULT;
-  #distinationModel = null;
+  #destinationModel = null;
 
-  #changeTripEventMode = null;
   #changeViewAction = null;
-  #destroyEditTripEventPresenter = null;
+  #closeEditHandler = null;
 
-  constructor(
-    listTripEventContainer,
-    tripEventTypesOffersModel,
-    destinationModel,
-    itemTripEventView,
-    destroyEditTripEventPresenter,
-    changeViewAction
-  ) {
-    this.#listTripEventContainer = listTripEventContainer;
-    this.#offersModel = tripEventTypesOffersModel;
-    this.#distinationModel = destinationModel;
-    this.#itemTripEventView = itemTripEventView;
-    this.#destroyEditTripEventPresenter = destroyEditTripEventPresenter;
+  constructor(listContainer, offersModel, destinationModel, closeEditHandler, changeViewAction) {
+    this.#listContainer = listContainer;
+    this.#offersModel = offersModel;
+    this.#destinationModel = destinationModel;
+    this.#closeEditHandler = closeEditHandler;
     this.#changeViewAction = changeViewAction;
   }
 
@@ -47,22 +36,14 @@ export default class EditTripEventPresenter {
     this.#editTripEventView = editTripEvenView;
   }
 
-  get itemTripEventView() {
-    return this.#itemTripEventView;
-  }
-
-  set itemTripEventView(itemTripEventView) {
-    this.#itemTripEventView = itemTripEventView;
-  }
-
   get listTripEventContainer() {
-    return this.#listTripEventContainer;
+    return this.#listContainer;
   }
 
   init(tripEventsModel) {
     this.#tripEventModel = tripEventsModel;
 
-    this.#editTripEventView = new EditTripEventView(tripEventsModel, this.#distinationModel);
+    this.#editTripEventView = new EditTripEventView(tripEventsModel, this.#destinationModel);
     this.#renderOffersEditTripEvent(this.#tripEventModel);
 
     this.#editTripEventView.setRollupEditClickHandler(this.#handleRollupEditClick);
@@ -75,13 +56,13 @@ export default class EditTripEventPresenter {
   onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#destroyEditTripEventPresenter();
+      this.#closeEditHandler();
       document.removeEventListener('keydown', this.onEscKeyDown);
     }
   };
 
   #handleRollupEditClick = () => {
-    this.#destroyEditTripEventPresenter();
+    this.#closeEditHandler();
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
@@ -91,7 +72,6 @@ export default class EditTripEventPresenter {
       UpdateType.PATCH,
       {...changeItemTripEvent}
     );
-    //this.#destroyEditTripEventPresenter();
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
@@ -110,7 +90,7 @@ export default class EditTripEventPresenter {
   };
 
   #handlerDestinationChange = (nameCity) => {
-    const tmp = this.#distinationModel.find((element) => (element.name ===  nameCity));
+    const tmp = this.#destinationModel.destinations.find((element) => (element.name ===  nameCity));
     return tmp;
   };
 
