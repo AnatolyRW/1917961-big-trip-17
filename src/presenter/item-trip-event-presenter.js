@@ -2,7 +2,6 @@ import { Mode } from '../const.js';
 import { remove, render, replace } from '../framework/render.js';
 import ItemTripEventView from '../view/item-trip-event-view.js';
 import EditTripEventPresenter from './edit-trip-event-presenter.js';
-import OffersItemTripEventPresenter from './offers-item-trip-event-presenter.js';
 import { UserAction, UpdateType } from '../const.js';
 
 export default class ItemTripEventPresenter {
@@ -60,8 +59,7 @@ export default class ItemTripEventPresenter {
     const prevItemTripEventView = this.#itemTripEventView;
     const prevEditTripEvenView = this.#editTripEvenView;
 
-    this.#itemTripEventView = new ItemTripEventView(tripEventsModel);
-    this.#renderOffersItemTripEvent();
+    this.#itemTripEventView = new ItemTripEventView(tripEventsModel, this.#offersModel);
 
     this.#itemTripEventView.setRolloutEditClickHandler(this.#handleRolloutEditClick);
     this.#itemTripEventView.setFavoriteClickHandler(this.#handleFavoriteClick);
@@ -105,11 +103,6 @@ export default class ItemTripEventPresenter {
     this.#replaceItemToEdit();
     document.addEventListener('keydown', this.#editTripEventPresenter.onEscKeyDown);
   };
-
-  #renderOffersItemTripEvent() {
-    const offersItemTripEventPresenter = new OffersItemTripEventPresenter(this.#itemTripEventView, this.#tripEventModel);
-    offersItemTripEventPresenter.init(this.#offersModel);
-  }
 
   resetView = () => {
     if (this.#isEdit) {

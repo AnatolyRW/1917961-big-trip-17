@@ -4,6 +4,7 @@ import { sortPrice, sortTime, sortDay, filter } from '../util/common.js';
 
 import SortTripEventsPresenter from '../presenter/sort-trip-evets-presenter.js';
 import ItemTripEventPresenter from './item-trip-event-presenter.js';
+import AddTripEventPresenter from './add-trip-event-presenter.js';
 
 import ListTripEventsView from '../view/list-trip-events-view.js';
 import NoTripEventsView from '../view/no-trip-events-view.js';
@@ -14,7 +15,7 @@ export default class MainPresenter {
   #noTripEventsView = null;
 
   #sortTripEventsPresent = null;
-  #filterTripEventsPresenter = null;
+  #addTripEventPresenter = null;
   #itemsTripEventPresenter = new Map();
 
   #itemTripEventsModel = null;
@@ -30,6 +31,13 @@ export default class MainPresenter {
     this.#offersModel = offersModel;
     this.#destinationModel = destinationModel;
     this.#filterModel = filterModel;
+    this.#addTripEventPresenter = new AddTripEventPresenter(
+      this.#listTripEventsView,
+      this.#offersModel,
+      this.#destinationModel,
+      this.#handleItemTripEventModeChange,
+      this.#handleViewAction,
+    );
     this.#itemTripEventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
@@ -52,6 +60,12 @@ export default class MainPresenter {
   init() {
     this.#renderlist();
   }
+
+  createTripEvent = (callback) => {
+    this.#currentSortType = SortType.DEFAULT;
+    this.#filterModel.setFilter(UpdateType.MINOR, FilterType.EVERYTHING);
+    this.#addTripEventPresenter.init(callback);
+  };
 
   #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {

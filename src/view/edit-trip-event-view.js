@@ -43,7 +43,25 @@ const createTypeItemTripEvent = (tripEventTypes, type) => {
   return listTypeTripEvent;
 };
 
-const createEditTripEventTemplate = (tripEvent, distinationModel) => {
+const createItemTripEventOffers = (offersModel, tripEvent) => {
+  const offersWithType = offersModel.offers.find((offer) => (offer.type === tripEvent.type));
+  if (offersWithType !== undefined) {
+    return offersWithType.offers.map((offer) => {
+      const checked = tripEvent.offers.includes(offer.id) ? 'checked' : '';
+      return `<div class="event__offer-selector">
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${offer.id}" type="checkbox" name="event-offer-luggage" ${checked} data-offer-id=${offer.id}>
+              <label class="event__offer-label" for="event-offer-luggage-${offer.id}">
+                <span class="event__offer-title">${offer.title}</span>
+                 &plus;&euro;&nbsp;
+                 <span class="event__offer-price">${offer.price}</span>
+               </label>
+            </div>`;
+    }).join('');
+  }
+  return '';
+};
+
+const createEditTripEventTemplate = (tripEvent, distinationModel, offersModel) => {
   const { basePrice,
     dateFrom,
     dateTo,
@@ -100,7 +118,7 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice.toString()}" pattern="[1-9]+">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -114,6 +132,7 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
+          ${createItemTripEventOffers(offersModel, tripEvent)}
           </div>
         </section>
 
@@ -130,19 +149,21 @@ const createEditTripEventTemplate = (tripEvent, distinationModel) => {
 export default class EditTripEventView extends AbstractStatefulView {
 
   #distinationModel = null;
+  #offersModel = null;
   #datepicker = null;
 
-  constructor(tripEvent, distinationModel) {
+  constructor(tripEvent, distinationModel, offersModel) {
     super();
     this._state = EditTripEventView.parseTripEventToState(tripEvent);
     this.#distinationModel = distinationModel;
+    this.#offersModel = offersModel;
     this.#setInnerHandlers();
     this.#setDateFromPicker();
     this.#setDateToPicker();
   }
 
   get template() {
-    return createEditTripEventTemplate(this._state, this.#distinationModel);
+    return createEditTripEventTemplate(this._state, this.#distinationModel, this.#offersModel);
   }
 
   get containerOffersElement() {
@@ -182,7 +203,6 @@ export default class EditTripEventView extends AbstractStatefulView {
     this.updateElement({
       destination: this._callback.destinationChange(evt.target.value)
     });
-    this._callback.renderOffers(this._state);
   };
 
   setDeleteClickHandler = (callback) => {
@@ -195,11 +215,6 @@ export default class EditTripEventView extends AbstractStatefulView {
     this._callback.deleteClick(this._state);
   };
 
-
-  setRenderOffersEditTripEvent = (callback) => {
-    this._callback.renderOffers = callback;
-  };
-
   #changeTypeTripEvent = (evt) => {
     evt.preventDefault();
     if (evt.target.tagName !== 'LABEL' || evt.target.innerText === this._state.type) {
@@ -209,7 +224,29 @@ export default class EditTripEventView extends AbstractStatefulView {
       offers: [],
       type: evt.target.innerText
     });
-    this._callback.renderOffers(this._state);
+  };
+
+  #changePriceTripEvent = (evt) => {
+    evt.preventDefault();
+    const reg = /^(?:[1-9]\d*|\d)$/;
+    if (!reg.test(evt.target.value)) {
+      return;
+    }
+    this.updateElement({
+      basePrice: parseInt(evt.target.value, 10)
+    });
+  };
+
+  #offersToggleHandler = (evt) => {
+    if (!evt.target.classList.contains('event__offer-checkbox')) {
+      return;
+    }
+    const offers = Array.from(this.element.querySelectorAll('.event__offer-checkbox'))
+      .filter((element) => element.checked)
+      .map((element) => Number(element.dataset.offerId));
+    this.updateElement({
+      offers: offers,
+    });
   };
 
   static parseTripEventToState = (tripEvent) => ({ ...tripEvent });
@@ -221,6 +258,10 @@ export default class EditTripEventView extends AbstractStatefulView {
 
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#changeTypeTripEvent);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#changePriceTripEvent);
+    if (this.element.querySelector('.event__available-offers')) {
+      this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersToggleHandler);
+    }
   };
 
   _restoreHandlers = () => {
@@ -236,7 +277,6 @@ export default class EditTripEventView extends AbstractStatefulView {
     this.updateElement({
       dateFrom: newDateFrom,
     });
-    this._callback.renderOffers(this._state);
   };
 
   #setDateFromPicker = () => {
@@ -248,6 +288,7 @@ export default class EditTripEventView extends AbstractStatefulView {
         // eslint-disable-next-line camelcase
         time_24hr: true,
         defaultDate: this._state.dateFrom,
+        maxDate: this._state.dateTo,
         onChange: this.#dateFromChangeHandler,
       },
     );
@@ -257,7 +298,6 @@ export default class EditTripEventView extends AbstractStatefulView {
     this.updateElement({
       dateTo: newDateTo,
     });
-    this._callback.renderOffers(this._state);
   };
 
   #setDateToPicker = () => {
@@ -269,6 +309,7 @@ export default class EditTripEventView extends AbstractStatefulView {
         // eslint-disable-next-line camelcase
         time_24hr: true,
         defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
         onChange: this.#dateToChangeHandler,
       },
     );

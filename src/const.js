@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const Mode = {
   DEFAULT: false,
   EDITING: true
@@ -27,6 +29,20 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
+const BlankTripEvent = {
+  basePrice: '',
+  dateFrom: dayjs().toISOString(),
+  dateTo: dayjs().toISOString(),
+  destination: {
+    description: ' ',
+    name: 'London',
+    pictures: [],
+  },
+  isFavorite: false,
+  offers: [],
+  type: 'taxi',
+};
+
 const EIGHT = 8;
 
-export { Mode, FilterType, SortType, UpdateType, UserAction, EIGHT };
+export { Mode, FilterType, SortType, UpdateType, UserAction, EIGHT, BlankTripEvent };
