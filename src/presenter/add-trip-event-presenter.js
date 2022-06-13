@@ -1,12 +1,12 @@
-import { remove } from '../framework/render.js';
-import EditTripEventView from '../view/edit-trip-event-view.js';
-import { UserAction, UpdateType } from '../const.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
+import AddTripEventView from '../view/add-trip-event-view.js';
+import { UserAction, UpdateType, BlankTripEvent } from '../const.js';
 
-export default class EditTripEventPresenter {
+export default class AddTripEventPresenter {
 
   #listContainer = null;
   #itemTripEventView = null;
-  #editTripEventView = null;
+  #addTripEventView = null;
 
   #tripEventModel = null;
   #offersModel = null;
@@ -14,6 +14,8 @@ export default class EditTripEventPresenter {
 
   #changeViewAction = null;
   #closeEditHandler = null;
+
+  #destroyCallback = null;
 
   constructor(listContainer, offersModel, destinationModel, closeEditHandler, changeViewAction) {
     this.#listContainer = listContainer;
@@ -28,24 +30,31 @@ export default class EditTripEventPresenter {
   }
 
   get editTripEvenView() {
-    return this.#editTripEventView;
+    return this.#addTripEventView;
   }
 
   set editTripEvenView(editTripEvenView) {
-    this.#editTripEventView = editTripEvenView;
+    this.#addTripEventView = editTripEvenView;
   }
 
   get listTripEventContainer() {
     return this.#listContainer;
   }
 
-  init(tripEventsModel) {
-    this.#tripEventModel = tripEventsModel;
-    this.#editTripEventView = new EditTripEventView(tripEventsModel, this.#destinationModel, this.#offersModel);
-    this.#editTripEventView.setRollupEditClickHandler(this.#handleRollupEditClick);
-    this.#editTripEventView.setSaveClickHandler(this.#handlerSaveClick);
-    this.#editTripEventView.setDeleteClickHandler(this.#handlerDeleteClick);
-    this.#editTripEventView.setDestinationChangeHandler(this.#handlerDestinationChange);
+  init(callback) {
+    this.#destroyCallback = callback;
+
+    if (this.#addTripEventView !== null) {
+      return;
+    }
+    this.#addTripEventView = new AddTripEventView(BlankTripEvent, this.#destinationModel, this.#offersModel);
+    this.#addTripEventView.setSaveClickHandler(this.#handlerSaveClick);
+    this.#addTripEventView.setCancelClickHandler(this.#handlerCancelClick);
+    this.#addTripEventView.setDestinationChangeHandler(this.#handlerDestinationChange);
+
+    render(this.#addTripEventView, this.#listContainer.element, RenderPosition.AFTERBEGIN);
+
+    document.addEventListener('keydown', this.onEscKeyDown);
   }
 
   onEscKeyDown = (evt) => {
@@ -56,26 +65,19 @@ export default class EditTripEventPresenter {
     }
   };
 
-  #handleRollupEditClick = () => {
-    this.#closeEditHandler();
-    document.removeEventListener('keydown', this.onEscKeyDown);
-  };
-
   #handlerSaveClick = (changeItemTripEvent) => {
     this.#changeViewAction(
-      UserAction.UPDATE_TRIP_EVENT,
-      UpdateType.PATCH,
+      UserAction.ADD_TRIP_EVENT,
+      UpdateType.MAJOR,
       {...changeItemTripEvent}
     );
+    this.#destroyCallback();
+    this.#addTripEventView = null;
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
-  #handlerDeleteClick = (itemTripEvent) => {
-    this.#changeViewAction(
-      UserAction.DELETE_TRIP_EVENT,
-      UpdateType.MINOR,
-      {...itemTripEvent}
-    );
+  #handlerCancelClick = () => {
+    this.desroy();
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
@@ -85,7 +87,9 @@ export default class EditTripEventPresenter {
   };
 
   desroy() {
-    remove(this.#editTripEventView);
+    remove(this.#addTripEventView);
+    this.#destroyCallback();
+    this.#addTripEventView = null;
   }
 
 }

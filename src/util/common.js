@@ -1,3 +1,4 @@
+import {FilterType} from '../const.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
 dayjs.extend(duration);
@@ -32,23 +33,15 @@ const getDurationDates = (dateFrom, dateTo) => {
 
 };
 
-const updateItemTripEventModel = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
-
 const applayFilterFuture = (itemTripEventModel) => dayjs().isBefore(itemTripEventModel.dateTo);
 
 const applayFilterPast = (itemTripEventModel) => dayjs().isAfter(itemTripEventModel.dateFrom);
+
+const filter = {
+  [FilterType.EVERYTHING]: (points) => points,
+  [FilterType.FUTURE]: (points) => points.filter(applayFilterFuture),
+  [FilterType.PAST]: (points) => points.filter(applayFilterPast),
+};
 
 const sortPrice = (a, b) => b.basePrice - a.basePrice;
 
@@ -58,5 +51,5 @@ const sortDay = (a, b) => dayjs(b.dateFrom).diff(a.dateFrom);
 
 export {
   getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray,
-  updateItemTripEventModel, applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay
+  applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay, filter
 };

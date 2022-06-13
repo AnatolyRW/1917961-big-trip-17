@@ -1,16 +1,18 @@
+import Observable from '../framework/observable.js';
 import { generateDestination } from '../mock/destination';
 import { NAME_CITYS } from '../mock/const.js';
 
-export default class DestinationModel {
+export default class DestinationModel extends Observable{
 
-  #destination = null;
+  #destinations = null;
 
   constructor() {
-    this.#destination = Array.from({length: NAME_CITYS.length}, generateDestination);
+    super();
+    this.#destinations = Array.from({length: NAME_CITYS.length}, generateDestination);
   }
 
-  get destination() {
-    return this.#destination;
+  get destinations() {
+    return this.#destinations;
   }
 
 }

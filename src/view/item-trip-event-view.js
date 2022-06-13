@@ -2,8 +2,22 @@ import { getDurationDates } from '../util/common.js';
 import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 
+const createItemTripEventOffers = (offersModel, tripEvent) => {
+  const offersWithType = offersModel.offers.find((offer) => (offer.type === tripEvent.type));
+  if (offersWithType !== undefined) {
+    return offersWithType.offers.map((offer) =>
+      tripEvent.offers.includes(offer.id) ?
+        `<li class="event__offer">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${offer.price}</span>
+      </li>` : ''
+    ).join('');
+  }
+  return '<li class="event__offer"></li>';
+};
 
-const createItemTrioEventTemplate = (tripEvent) => {
+const createItemTrioEventTemplate = (tripEvent, offersModel) => {
   const { basePrice,
     dateFrom,
     dateTo,
@@ -21,9 +35,9 @@ const createItemTrioEventTemplate = (tripEvent) => {
         <h3 class="event__title">${type} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dayjs(dateFrom).toDate()}">${dayjs(dateFrom).format('HH:MM')}</time>
+            <time class="event__start-time" datetime="${dayjs(dateFrom).toDate()}">${dayjs(dateFrom).format('HH:mm')}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dayjs(dateTo).toDate()}">${dayjs(dateTo).format('HH:MM')}</time>
+            <time class="event__end-time" datetime="${dayjs(dateTo).toDate()}">${dayjs(dateTo).format('HH:mm')}</time>
           </p>
           <p class="event__duration">${getDurationDates(dayjs(dateFrom), dayjs(dateTo))}</p>
         </div>
@@ -32,6 +46,7 @@ const createItemTrioEventTemplate = (tripEvent) => {
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
+        ${createItemTripEventOffers(offersModel, tripEvent)}
         </ul>
         <button class="event__favorite-btn  ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
           <span class="visually-hidden">Add to favorite</span>
@@ -50,14 +65,16 @@ const createItemTrioEventTemplate = (tripEvent) => {
 export default class ItemTripEventView extends AbstractView {
 
   #tripEvent = null;
+  #offersModel = null;
 
-  constructor(tripEvent) {
+  constructor(tripEvent, offersModel) {
     super();
     this.#tripEvent = tripEvent;
+    this.#offersModel = offersModel;
   }
 
   get template() {
-    return createItemTrioEventTemplate(this.#tripEvent);
+    return createItemTrioEventTemplate(this.#tripEvent, this.#offersModel);
   }
 
   setRolloutEditClickHandler = (callback) => {

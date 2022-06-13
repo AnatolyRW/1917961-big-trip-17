@@ -1,51 +1,80 @@
-import { FILTER } from '../const.js';
-import { applayFilterFuture, applayFilterPast } from '../util/common.js';
+import { FilterType, UpdateType } from '../const.js';
+import { filter } from '../util/common.js';
 import FilterTripEventsView from '../view/filter-trip-events-view';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import { render } from '../framework/render';
+import { render, replace, remove } from '../framework/render';
 dayjs.extend(utc);
 
 export default class FilterTripEventsPresenter {
 
-  #filterTripEventsView = new FilterTripEventsView(FILTER.EVERYTHING);
+  #filterTripEventsView = null;
   #noTripEventsView = null;
 
   #changeFilter = null;
+  #filterModel = null;
+  #itemTripEventsModel = null;
 
-  constructor(changeFilter) {
-    this.#changeFilter = changeFilter;
+  constructor(filterModel, itemsTripEventsModel) {
+    this.#filterModel = filterModel;
+    this.#itemTripEventsModel = itemsTripEventsModel;
+
+    this.#itemTripEventsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get filterTripEventsView() {
     return this.#filterTripEventsView;
   }
 
-  init() {
-    render(this.#filterTripEventsView, this.#filterTripEventsView.container);
-    this.#filterTripEventsView.setFilterChangeHandler(this.#handleFilterChange);
+  get filters() {
+    const tripEvents = this.#itemTripEventsModel.tripEvents;
+
+    return [
+      {
+        type: FilterType.EVERYTHING,
+        name: 'Everything',
+        count: filter[FilterType.EVERYTHING](tripEvents).length,
+      },
+      {
+        type: FilterType.FUTURE,
+        name: 'Future',
+        count: filter[FilterType.FUTURE](tripEvents).length,
+      },
+      {
+        type: FilterType.PAST,
+        name: 'Past',
+        count: filter[FilterType.PAST](tripEvents).length,
+      },
+    ];
   }
 
-  #handleFilterChange = (idFilter) => {
-    this.#changeFilter(idFilter);
+  init() {
+    const filters = this.filters;
+    const prevfilterTripEventsView = this.#filterTripEventsView;
+
+    this.#filterTripEventsView = new FilterTripEventsView(filters, this.#filterModel.filter);
+    this.#filterTripEventsView.setFilterChangeHandler(this.#handleFilterChange);
+
+    if (prevfilterTripEventsView === null) {
+      render(this.#filterTripEventsView, this.#filterTripEventsView.container);
+      return;
+    }
+
+    replace(this.#filterTripEventsView, prevfilterTripEventsView);
+    remove(prevfilterTripEventsView);
+  }
+
+  #handleModelEvent = () => {
+    this.init();
   };
 
-  filterChange = (idFilter, itemsTripEventSourceModel) => {
-    let itemsTripEventModel = [];
-    switch (idFilter) {
-      case FILTER.FUTURE:
-        itemsTripEventModel = itemsTripEventSourceModel.filter(applayFilterFuture);
-        break;
-      case FILTER.PAST:
-        itemsTripEventModel = itemsTripEventSourceModel.filter(applayFilterPast);
-        break;
-      case FILTER.EVERYTHING:
-        itemsTripEventModel = itemsTripEventSourceModel;
-        break;
-      default:
-        itemsTripEventModel = itemsTripEventSourceModel;
+  #handleFilterChange = (filterType) => {
+    if (this.#filterModel.filter === filterType) {
+      return;
     }
-    return itemsTripEventModel;
+
+    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   };
 
 }

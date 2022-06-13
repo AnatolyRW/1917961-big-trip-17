@@ -1,18 +1,48 @@
-const MODE = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING'
+import dayjs from 'dayjs';
+
+const Mode = {
+  DEFAULT: false,
+  EDITING: true
 };
 
-const FILTER = {
+const FilterType = {
   EVERYTHING: 'filter-everything',
   FUTURE: 'filter-future',
   PAST: 'filter-past'
 };
 
-const SORT_TYPE = {
+const SortType = {
   DAY: 'sort-day',
   TIME: 'sort-time',
   PRICE: 'sort-price'
 };
 
-export { MODE, FILTER, SORT_TYPE };
+const UserAction = {
+  UPDATE_TRIP_EVENT: 'UPDATE_TRIP_EVENT',
+  ADD_TRIP_EVENT: 'ADD_TRIP_EVENT',
+  DELETE_TRIP_EVENT: 'DELETE_TRIP_EVENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const BlankTripEvent = {
+  basePrice: '',
+  dateFrom: dayjs().toISOString(),
+  dateTo: dayjs().toISOString(),
+  destination: {
+    description: ' ',
+    name: 'London',
+    pictures: [],
+  },
+  isFavorite: false,
+  offers: [],
+  type: 'taxi',
+};
+
+const EIGHT = 8;
+
+export { Mode, FilterType, SortType, UpdateType, UserAction, EIGHT, BlankTripEvent };
