@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 
+const TRIP_EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+
 const Mode = {
   DEFAULT: false,
   EDITING: true
@@ -27,6 +29,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT'
 };
 
 const BlankTripEvent = {
@@ -45,4 +48,4 @@ const BlankTripEvent = {
 
 const EIGHT = 8;
 
-export { Mode, FilterType, SortType, UpdateType, UserAction, EIGHT, BlankTripEvent };
+export { TRIP_EVENT_TYPES, Mode, FilterType, SortType, UpdateType, UserAction, EIGHT, BlankTripEvent };

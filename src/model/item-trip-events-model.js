@@ -1,34 +1,50 @@
 import Observable from '../framework/observable.js';
-import { generateTripEvent } from '../mock/trip-event.js';
+import { UpdateType } from '../const.js';
 
 
 export default class ItemTripEventsModel extends Observable {
 
-  #tripEvents = null;
+  #tripEvents = [];
+  #tripEventsApiService = null;
 
-  constructor(tripEventTypesOffers, destinationModel) {
+  constructor(tripEventsApiService) {
     super();
-    this.#tripEvents = Array.from({length: 20}, generateTripEvent(tripEventTypesOffers.offers, destinationModel.destinations));
+    this.#tripEventsApiService = tripEventsApiService;
   }
+
+
+  init = async () => {
+    try {
+      const tripEvents = await this.#tripEventsApiService.tripEvents;
+      this.#tripEvents = tripEvents.map(this.#adaptToClient);
+    } catch (err) {
+      this.#tripEvents = [];
+    }
+    this._notify(UpdateType.INIT);
+  };
 
   get tripEvents() {
     return this.#tripEvents;
   }
 
-  updateTripEvent = (updateType, update) => {
+  updateTripEvent = async (updateType, update) => {
     const index = this.#tripEvents.findIndex((tripEvent) => tripEvent.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting task');
     }
-
-    this.#tripEvents = [
-      ...this.#tripEvents.slice(0, index),
-      update,
-      ...this.#tripEvents.slice(index + 1),
-    ];
-
-    this._notify(updateType, update);
+    try {
+      const response = await this.#tripEventsApiService.updateTripEvent(update);
+      const updateTripEvent = this.#adaptToClient(response);
+      this.#tripEvents = [
+        ...this.#tripEvents.slice(0, index),
+        updateTripEvent,
+        ...this.#tripEvents.slice(index + 1),
+      ];
+      this._notify(updateType, updateTripEvent);
+    } catch (err) {
+      throw new Error('Can\'t update task');
+    }
   };
 
   addTripEvent = (updateType, update) => {
@@ -53,5 +69,22 @@ export default class ItemTripEventsModel extends Observable {
     ];
 
     this._notify(updateType);
+  };
+
+  #adaptToClient = (tripEvent) => {
+    const adaptedTask = {
+      ...tripEvent,
+      basePrice: tripEvent['base_price'],
+      dateFrom: tripEvent['date_from'],
+      dateTo: tripEvent['date_to'],
+      isFavorite: tripEvent['is_favorite'],
+    };
+
+    delete adaptedTask['base_price'];
+    delete adaptedTask['date_from'];
+    delete adaptedTask['date_to'];
+    delete adaptedTask['is_favorite'];
+
+    return adaptedTask;
   };
 }

@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { TRIP_EVENT_TYPES } from '../mock/const.js';
+import { TRIP_EVENT_TYPES } from '../const.js';
 import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 
@@ -118,7 +118,7 @@ const createEditTripEventTemplate = (tripEvent, distinationModel, offersModel) =
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice.toString()}" pattern="[1-9]+">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice.toString()}" pattern="[0-9]+">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
