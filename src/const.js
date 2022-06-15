@@ -1,5 +1,3 @@
-import dayjs from 'dayjs';
-
 const TRIP_EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 const Mode = {
@@ -32,20 +30,6 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-const BlankTripEvent = {
-  basePrice: '',
-  dateFrom: dayjs().toISOString(),
-  dateTo: dayjs().toISOString(),
-  destination: {
-    description: ' ',
-    name: 'London',
-    pictures: [],
-  },
-  isFavorite: false,
-  offers: [],
-  type: 'taxi',
-};
-
 const EIGHT = 8;
 
-export { TRIP_EVENT_TYPES, Mode, FilterType, SortType, UpdateType, UserAction, EIGHT, BlankTripEvent };
+export { TRIP_EVENT_TYPES, Mode, FilterType, SortType, UpdateType, UserAction, EIGHT };

@@ -47,28 +47,36 @@ export default class ItemTripEventsModel extends Observable {
     }
   };
 
-  addTripEvent = (updateType, update) => {
-    this.#tripEvents = [
-      update,
-      ...this.#tripEvents,
-    ];
-
-    this._notify(updateType, update);
+  addTripEvent = async (updateType, update) => {
+    try {
+      const response = await this.#tripEventsApiService.addTripEvent(update);
+      const newTripEvent = this.#adaptToClient(response);
+      this.#tripEvents = [
+        newTripEvent,
+        ...this.#tripEvents,
+      ];
+      this._notify(updateType, update);
+    } catch (err) {
+      throw new Error('Can\'t add task');
+    }
   };
 
-  deleteTripEvent = (updateType, update) => {
+  deleteTripEvent = async (updateType, update) => {
     const index = this.#tripEvents.findIndex((task) => task.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting task');
     }
-
-    this.#tripEvents = [
-      ...this.#tripEvents.slice(0, index),
-      ...this.#tripEvents.slice(index + 1),
-    ];
-
-    this._notify(updateType);
+    try {
+      await this.#tripEventsApiService.deleteTtipEvent(update);
+      this.#tripEvents = [
+        ...this.#tripEvents.slice(0, index),
+        ...this.#tripEvents.slice(index + 1),
+      ];
+      this._notify(updateType);
+    } catch (err) {
+      throw new Error('Can\'t delete task');
+    }
   };
 
   #adaptToClient = (tripEvent) => {
