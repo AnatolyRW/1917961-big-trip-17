@@ -67,12 +67,7 @@ const renderPhotos = (distinationModel, checkedDestination) => {
 };
 
 const createEditTripEventTemplate = (tripEvent, destinationModel, offersModel) => {
-  const { basePrice,
-    dateFrom,
-    dateTo,
-    destination,
-    type
-  } = tripEvent;
+  const { basePrice, dateFrom, dateTo, destination, type, isDisabled, isSaving } = tripEvent;
   return (`
   <li>
    <form class="event event--edit" action="#" method="post">
@@ -88,7 +83,7 @@ const createEditTripEventTemplate = (tripEvent, destinationModel, offersModel) =
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Event type</legend>
 
-              ${createTypeItemTripEvent(TRIP_EVENT_TYPES, type)}
+              ${createTypeItemTripEvent(TRIP_EVENT_TYPES, type, isDisabled)}
 
             </fieldset>
           </div>
@@ -98,13 +93,16 @@ const createEditTripEventTemplate = (tripEvent, destinationModel, offersModel) =
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
+
           <input class="event__input  event__input--destination"
           id="event-destination-1"
           type="text"
           name="event-destination"
           value="${destination.name}"
           list="destination-list-1"
-          ${patternDestination(destinationModel)}>
+          ${patternDestination(destinationModel)}
+          ${isDisabled ? 'disabled' : ''}>
+
           <datalist id="destination-list-1">
             ${createDestinationList(destinationModel)}
           </datalist>
@@ -112,10 +110,23 @@ const createEditTripEventTemplate = (tripEvent, destinationModel, offersModel) =
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dateFrom).format('DD/MM/YY HH:MM')}">
+
+          <input class="event__input  event__input--time"
+          id="event-start-time-1"
+          type="text"
+          name="event-start-time"
+          value="${dayjs(dateFrom).format('DD/MM/YY HH:MM')}"
+          ${isDisabled ? 'disabled' : ''}>
+
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dateTo).format('DD/MM/YY HH:MM')}">
+
+          <input class="event__input  event__input--time"
+          id="event-end-time-1" type="text"
+          name="event-end-time"
+          value="${dayjs(dateTo).format('DD/MM/YY HH:MM')}"
+          ${isDisabled ? 'disabled' : ''}>
+
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -123,11 +134,22 @@ const createEditTripEventTemplate = (tripEvent, destinationModel, offersModel) =
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice.toString()}" pattern="[0-9]+">
+
+          <input class="event__input event__input--price"
+          id="event-price-1"
+          type="text"
+          name="event-price"
+          value="${basePrice.toString()}"
+          ${isDisabled ? 'disabled' : ''}
+          pattern="[0-9]+">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${ basePrice < 1 || isDisabled ? 'disabled' : ''}>
+          ${isSaving ? 'Saving...' : 'Save'}
+        </button>
+        <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+          Cancel
+        </button>
 
       </header>
       <section class="event__details">
@@ -243,15 +265,23 @@ export default class AddTripEventView extends AbstractStatefulView {
     const offers = Array.from(this.element.querySelectorAll('.event__offer-checkbox'))
       .filter((element) => element.checked)
       .map((element) => Number(element.dataset.offerId));
-    this.updateElement({
+    this._setState({
       offers: offers,
     });
   };
 
-  static parseTripEventToState = (tripEvent) => ({ ...tripEvent });
+  static parseTripEventToState = (tripEvent) => (
+    { ...tripEvent,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    });
 
   static parseStateToTripEvent = (state) => {
     const tripEvent = { ...state };
+    delete tripEvent.isDisabled;
+    delete tripEvent.isSaving;
+    delete tripEvent.isDeleting;
     return tripEvent;
   };
 
@@ -273,7 +303,7 @@ export default class AddTripEventView extends AbstractStatefulView {
   };
 
   #dateFromChangeHandler = ([newDateFrom]) => {
-    this.updateElement({
+    this._setState({
       dateFrom: newDateFrom,
     });
   };
@@ -294,7 +324,7 @@ export default class AddTripEventView extends AbstractStatefulView {
   };
 
   #dateToChangeHandler = ([newDateTo]) => {
-    this.updateElement({
+    this._setState({
       dateTo: newDateTo,
     });
   };

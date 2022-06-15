@@ -121,4 +121,39 @@ export default class ItemTripEventPresenter {
     this.#editTripEventPresenter = null;
   };
 
+  setSaving = () => {
+    if (this.#isEdit) {
+      this.#editTripEventPresenter.editTripEvenView.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#isEdit) {
+      this.#editTripEventPresenter.editTripEvenView.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  };
+
+  setAborting = () => {
+    if (!this.#isEdit) {
+      this.#itemTripEventView.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editTripEventPresenter.editTripEvenView.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editTripEventPresenter.editTripEvenView.shake(resetFormState);
+  };
+
 }

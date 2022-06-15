@@ -9,11 +9,18 @@ import AddTripEventPresenter from './add-trip-event-presenter.js';
 import ListTripEventsView from '../view/list-trip-events-view.js';
 import NoTripEventsView from '../view/no-trip-events-view.js';
 import LoadingView from '../view/loading-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class MainPresenter {
   #listTripEventsView = new ListTripEventsView();
   #noTripEventsView = null;
-  #loadingComponent = new LoadingView();
+  #loadingView = new LoadingView();
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   #sortTripEventsPresent = null;
   #addTripEventPresenter = null;
@@ -45,7 +52,7 @@ export default class MainPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  get tripEvents () {
+  get tripEvents() {
     this.#currentFilter = this.#filterModel.filter;
     const tripEvents = this.#itemTripEventsModel.tripEvents;
     const filteredTripEvents = filter[this.#currentFilter](tripEvents);
@@ -70,19 +77,35 @@ export default class MainPresenter {
     this.#addTripEventPresenter.init(callback);
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_TRIP_EVENT:
-        this.#itemTripEventsModel.updateTripEvent(updateType, update);
+        this.#itemsTripEventPresenter.get(update.id).setSaving();
+        try {
+          await this.#itemTripEventsModel.updateTripEvent(updateType, update);
+        } catch (err) {
+          this.#itemsTripEventPresenter.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_TRIP_EVENT:
-        this.#itemTripEventsModel.addTripEvent(updateType, update);
+        this.#addTripEventPresenter.setSaving();
+        try {
+          await this.#itemTripEventsModel.addTripEvent(updateType, update);
+        } catch (err) {
+          this.#addTripEventPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_TRIP_EVENT:
-        this.#itemTripEventsModel.deleteTripEvent(updateType, update);
+        this.#itemsTripEventPresenter.get(update.id).setDeleting();
+        try {
+          await this.#itemTripEventsModel.deleteTripEvent(updateType, update);
+        } catch (err) {
+          this.#itemsTripEventPresenter.get(update.id).setAborting();
+        }
         break;
-
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -100,7 +123,7 @@ export default class MainPresenter {
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
-        remove(this.#loadingComponent);
+        remove(this.#loadingView);
         this.#renderlist();
         break;
     }
@@ -120,7 +143,7 @@ export default class MainPresenter {
   };
 
   #renderLoading = () => {
-    render(this.#loadingComponent, this.#listTripEventsView.element, RenderPosition.AFTERBEGIN);
+    render(this.#loadingView, this.#listTripEventsView.element, RenderPosition.AFTERBEGIN);
   };
 
   #renderSort = () => {
@@ -133,7 +156,8 @@ export default class MainPresenter {
     render(this.#noTripEventsView, this.#noTripEventsView.container);
   };
 
-  #renderlist() {
+  #renderlist = () => {
+    render(this.#listTripEventsView, this.#listTripEventsView.container);
     if (this.#isLoading) {
       this.#renderLoading();
       return;
@@ -145,9 +169,8 @@ export default class MainPresenter {
       return;
     }
     this.#renderSort();
-    render(this.#listTripEventsView, this.#listTripEventsView.container);
     this.tripEvents.forEach(this.#renderTripEventItem);
-  }
+  };
 
   #renderTripEventItem = (itemTripEventModel) => {
     const itemTripEventPresenter = new ItemTripEventPresenter(
@@ -165,7 +188,7 @@ export default class MainPresenter {
     this.#itemsTripEventPresenter.forEach((presenter) => presenter.desroy());
     this.#itemsTripEventPresenter.clear();
     this.#sortTripEventsPresent.desroy();
-    remove(this.#loadingComponent);
+    remove(this.#loadingView);
     if (this.#noTripEventsView) {
       remove(this.#noTripEventsView);
     }

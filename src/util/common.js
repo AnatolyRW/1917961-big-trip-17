@@ -1,4 +1,4 @@
-import {FilterType} from '../const.js';
+import { FilterType } from '../const.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
 dayjs.extend(duration);
@@ -49,7 +49,18 @@ const sortTime = (a, b) => dayjs(b.dateTo).diff(b.dateFrom) - dayjs(a.dateTo).di
 
 const sortDay = (a, b) => dayjs(b.dateFrom).diff(a.dateFrom);
 
+const getBlankTripEvent = (destinationModel) => ({
+  basePrice: 0,
+  dateFrom: dayjs().toISOString(),
+  dateTo: dayjs().toISOString(),
+  destination: destinationModel.destinations[0],
+  isFavorite: false,
+  offers: [],
+  type: 'taxi',
+});
+
+
 export {
   getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray,
-  applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay, filter
+  applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay, filter, getBlankTripEvent
 };

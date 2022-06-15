@@ -1,6 +1,7 @@
 import { render, remove, RenderPosition } from '../framework/render.js';
 import AddTripEventView from '../view/add-trip-event-view.js';
-import { UserAction, UpdateType, BlankTripEvent } from '../const.js';
+import { UserAction, UpdateType } from '../const.js';
+import { getBlankTripEvent } from '../util/common.js';
 
 export default class AddTripEventPresenter {
 
@@ -47,7 +48,7 @@ export default class AddTripEventPresenter {
     if (this.#addTripEventView !== null) {
       return;
     }
-    this.#addTripEventView = new AddTripEventView(BlankTripEvent, this.#destinationModel, this.#offersModel);
+    this.#addTripEventView = new AddTripEventView(getBlankTripEvent(this.#destinationModel), this.#destinationModel, this.#offersModel);
     this.#addTripEventView.setSaveClickHandler(this.#handlerSaveClick);
     this.#addTripEventView.setCancelClickHandler(this.#handlerCancelClick);
     this.#addTripEventView.setDestinationChangeHandler(this.#handlerDestinationChange);
@@ -69,11 +70,8 @@ export default class AddTripEventPresenter {
     this.#changeViewAction(
       UserAction.ADD_TRIP_EVENT,
       UpdateType.MAJOR,
-      {...changeItemTripEvent}
+      { ...changeItemTripEvent }
     );
-    this.#destroyCallback();
-    this.#addTripEventView = null;
-    document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
   #handlerCancelClick = () => {
@@ -82,14 +80,36 @@ export default class AddTripEventPresenter {
   };
 
   #handlerDestinationChange = (nameCity) => {
-    const tmp = this.#destinationModel.destinations.find((element) => (element.name ===  nameCity));
+    const tmp = this.#destinationModel.destinations.find((element) => (element.name === nameCity));
     return tmp;
   };
 
+  setSaving = () => {
+    this.#addTripEventView.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#addTripEventView.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+    this.#addTripEventView.shake(resetFormState);
+  };
+
   desroy() {
+    if (this.#addTripEventView === null) {
+      return;
+    }
+    this.#destroyCallback?.();
     remove(this.#addTripEventView);
-    this.#destroyCallback();
     this.#addTripEventView = null;
+    document.removeEventListener('keydown', this.onEscKeyDown);
   }
 
 }
