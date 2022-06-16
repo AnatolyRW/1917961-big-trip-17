@@ -8,8 +8,7 @@ import FilterModel from './model/filter-model.js';
 import FilterTripEventsPresenter from './presenter/filter-trip-events-presenter.js';
 import TripEventsApiService from './trip-events-api-service.js';
 
-const AUTHORIZATION = 'Basic RrA67YtrHH89KLlkwwU48nm';
-//const END_POINT = 'https://17.ecmascript.pages.academy/task-manager';
+const AUTHORIZATION = 'Basic RrA67YtrHH89KLlkwwU48nm1';
 const END_POINT = 'https://17.ecmascript.pages.academy/big-trip';
 const tripEventsApiService = new TripEventsApiService(END_POINT, AUTHORIZATION);
 const offersModel = new OffersModel(tripEventsApiService);

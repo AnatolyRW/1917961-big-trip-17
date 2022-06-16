@@ -303,7 +303,7 @@ export default class AddTripEventView extends AbstractStatefulView {
   };
 
   #dateFromChangeHandler = ([newDateFrom]) => {
-    this._setState({
+    this.updateElement({
       dateFrom: newDateFrom,
     });
   };
@@ -324,7 +324,7 @@ export default class AddTripEventView extends AbstractStatefulView {
   };
 
   #dateToChangeHandler = ([newDateTo]) => {
-    this._setState({
+    this.updateElement({
       dateTo: newDateTo,
     });
   };

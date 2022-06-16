@@ -9,6 +9,7 @@ import AddTripEventPresenter from './add-trip-event-presenter.js';
 import ListTripEventsView from '../view/list-trip-events-view.js';
 import NoTripEventsView from '../view/no-trip-events-view.js';
 import LoadingView from '../view/loading-view.js';
+import TripInfoView from '../view/trip-info-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const TimeLimit = {
@@ -20,6 +21,7 @@ export default class MainPresenter {
   #listTripEventsView = new ListTripEventsView();
   #noTripEventsView = null;
   #loadingView = new LoadingView();
+  #trimInfoView = null;
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   #sortTripEventsPresent = null;
@@ -130,6 +132,7 @@ export default class MainPresenter {
   };
 
   #handleItemTripEventModeChange = () => {
+    this.#addTripEventPresenter.desroy();
     this.#itemsTripEventPresenter.forEach((presenter) => presenter.resetView());
   };
 
@@ -156,6 +159,11 @@ export default class MainPresenter {
     render(this.#noTripEventsView, this.#noTripEventsView.container);
   };
 
+  #renderTripInfo = () => {
+    this.#trimInfoView = new TripInfoView(this.#itemTripEventsModel, this.#offersModel);
+    render(this.#trimInfoView, this.#trimInfoView.container, RenderPosition.AFTERBEGIN);
+  };
+
   #renderlist = () => {
     render(this.#listTripEventsView, this.#listTripEventsView.container);
     if (this.#isLoading) {
@@ -169,6 +177,7 @@ export default class MainPresenter {
       return;
     }
     this.#renderSort();
+    this.#renderTripInfo();
     this.tripEvents.forEach(this.#renderTripEventItem);
   };
 
@@ -185,6 +194,7 @@ export default class MainPresenter {
   };
 
   #clearList({ resetSortType = false } = {}) {
+    this.#addTripEventPresenter.desroy();
     this.#itemsTripEventPresenter.forEach((presenter) => presenter.desroy());
     this.#itemsTripEventPresenter.clear();
     this.#sortTripEventsPresent.desroy();
@@ -195,6 +205,9 @@ export default class MainPresenter {
     remove(this.#listTripEventsView,);
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
+    }
+    if(this.#trimInfoView) {
+      remove(this.#trimInfoView);
     }
   }
 }

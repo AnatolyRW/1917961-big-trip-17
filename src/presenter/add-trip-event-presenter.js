@@ -72,6 +72,7 @@ export default class AddTripEventPresenter {
       UpdateType.MAJOR,
       { ...changeItemTripEvent }
     );
+    //this.desroy();
   };
 
   #handlerCancelClick = () => {
