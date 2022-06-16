@@ -3,7 +3,7 @@ import SortTripEventsView from '../view/sort-trip-events-view.js';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import { render, remove } from '../framework/render';
+import { render, remove, RenderPosition } from '../framework/render';
 dayjs.extend(utc);
 
 export default class SortTripEventsPresenter {
@@ -20,7 +20,7 @@ export default class SortTripEventsPresenter {
   init(sortTypeChange) {
     this.#sortTypeChange = sortTypeChange;
     this.#sortTripEventsView = new SortTripEventsView(this.#currentSortType);
-    render(this.#sortTripEventsView, this.#sortTripEventsView.container);
+    render(this.#sortTripEventsView, this.#sortTripEventsView.container, RenderPosition.AFTERBEGIN);
     this.#sortTripEventsView.setSortChangeHandler(this.#handleSortChange);
   }
 
