@@ -79,10 +79,7 @@ export default class AddTripEventPresenter {
     document.removeEventListener('keydown', this.onEscKeyDown);
   };
 
-  #handlerDestinationChange = (nameCity) => {
-    const tmp = this.#destinationModel.destinations.find((element) => (element.name === nameCity));
-    return tmp;
-  };
+  #handlerDestinationChange = (nameCity) => this.#destinationModel.destinations.find((element) => (element.name === nameCity));
 
   setSaving = () => {
     this.#addTripEventView.updateElement({

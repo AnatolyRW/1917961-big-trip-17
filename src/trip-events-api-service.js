@@ -47,7 +47,7 @@ export default class TripEventsApiService extends ApiService {
     return parsedResponse;
   };
 
-  deleteTtipEvent = async (tripEvent) => {
+  deleteTripEvent = async (tripEvent) => {
     const response = await this._load({
       url: `points/${tripEvent.id}`,
       method: Method.DELETE,

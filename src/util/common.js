@@ -8,13 +8,6 @@ const getRandomInteger = (beginInteger, endInteger) => {
   return Math.floor(Math.random() * (rangeInteger) + Math.min(beginInteger, endInteger));
 };
 
-const checkLengthString = (stringCheck, maxLengthString) => maxLengthString >= stringCheck.length;
-
-const deleteRandomValueFromArray = (arrayFromGetIdentifier) => {
-  const index = getRandomInteger(0, arrayFromGetIdentifier.length - 1);
-  return arrayFromGetIdentifier.splice(index, 1)[0];
-};
-
 const getDurationDates = (dateFrom, dateTo) => {
   const diff = dateTo.diff(dateFrom);
   const countDays = dayjs.duration(diff).format('DD');
@@ -61,6 +54,5 @@ const getBlankTripEvent = (destinationModel) => ({
 
 
 export {
-  getRandomInteger, checkLengthString, getDurationDates, deleteRandomValueFromArray,
-  applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay, filter, getBlankTripEvent
+  getRandomInteger, getDurationDates, applayFilterFuture, applayFilterPast, sortPrice, sortTime, sortDay, filter, getBlankTripEvent
 };

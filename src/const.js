@@ -30,6 +30,4 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-const EIGHT = 8;
-
-export { TRIP_EVENT_TYPES, Mode, FilterType, SortType, UpdateType, UserAction, EIGHT };
+export { TRIP_EVENT_TYPES, Mode, FilterType, SortType, UpdateType, UserAction };

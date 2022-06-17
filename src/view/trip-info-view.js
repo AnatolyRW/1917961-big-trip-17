@@ -10,7 +10,7 @@ const CountTravelItinerary = {
   THREE: 3
 };
 
-const сalculatePriceOffersTotal = (offersModel, tripEvent) => {
+const calculatePriceOffersTotal = (offersModel, tripEvent) => {
   const offersWithType = offersModel.offers.find((offer) => (offer.type === tripEvent.type));
   let priceOffersTotal = 0;
   if (offersWithType !== undefined) {
@@ -23,10 +23,10 @@ const сalculatePriceOffersTotal = (offersModel, tripEvent) => {
   return priceOffersTotal;
 };
 
-const сalculatePriceTotal = (itemsTripEventsModel, offersModel) => {
+const calculatePriceTotal = (itemsTripEventsModel, offersModel) => {
   let priceTotal = 0;
   itemsTripEventsModel.tripEvents.forEach((tripEvent) => {
-    priceTotal += сalculatePriceOffersTotal(offersModel, tripEvent) + tripEvent.basePrice;
+    priceTotal += calculatePriceOffersTotal(offersModel, tripEvent) + tripEvent.basePrice;
   });
   return priceTotal;
 };
@@ -72,7 +72,7 @@ const createPriceTotalTemplate = (itemsTripEventsModel, offersModel) => (`
   <p class="trip-info__cost">
     Total: &euro;&nbsp;
     <span class="trip-info__cost-value">
-      ${сalculatePriceTotal(itemsTripEventsModel, offersModel)}
+      ${calculatePriceTotal(itemsTripEventsModel, offersModel)}
     </span>
   </p>
 </section>

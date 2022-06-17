@@ -68,7 +68,7 @@ export default class ItemTripEventsModel extends Observable {
       throw new Error('Can\'t delete unexisting task');
     }
     try {
-      await this.#tripEventsApiService.deleteTtipEvent(update);
+      await this.#tripEventsApiService.deleteTripEvent(update);
       this.#tripEvents = [
         ...this.#tripEvents.slice(0, index),
         ...this.#tripEvents.slice(index + 1),
